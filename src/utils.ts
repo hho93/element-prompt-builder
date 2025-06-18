@@ -221,7 +221,6 @@ export function createElementsPrompt(
 ): string {
   if (!selectedElements || selectedElements.length === 0) {
     return `
-# Goal
 ${userPrompt}
 
 ## Context
@@ -234,7 +233,6 @@ No specific element was selected on the page. Please analyze the page code in ge
   });
 
   return `
-# Goal
 ${userPrompt}
 
 ## Selected Elements
