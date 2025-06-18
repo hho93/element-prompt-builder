@@ -77,64 +77,58 @@ function getElementAttributes(element) {
 }
 function generateElementContext(element, index) {
   var _a;
-  let context = `<element index="${index + 1}">
+  let context = `### Element ${index + 1}
 `;
-  context += `  <tag>${element.tagName.toLowerCase()}</tag>
+  context += `- **Tag**: ${element.tagName.toLowerCase()}
 `;
   const id = element.id;
   if (id) {
-    context += `  <id>${id}</id>
+    context += `- **ID**: ${id}
 `;
   }
   const classes = Array.from(element.classList).join(", ");
   if (classes) {
-    context += `  <classes>${classes}</classes>
+    context += `- **Classes**: ${classes}
 `;
   }
   const attributes = getElementAttributes(element);
   if (Object.keys(attributes).length > 0) {
-    context += `  <attributes>
+    context += `- **Attributes**:
 `;
     for (const [key, value] of Object.entries(attributes)) {
       if (key.toLowerCase() !== "class" || !classes) {
-        context += `    <${key}>${value}</${key}>
+        context += `  - ${key}: ${value}
 `;
       }
     }
-    context += `  </attributes>
-`;
   }
   const text2 = (_a = element.innerText) == null ? void 0 : _a.trim();
   if (text2) {
     const maxLength = 100;
-    context += `  <text>${text2.length > maxLength ? `${text2.substring(0, maxLength)}...` : text2}</text>
+    context += `- **Text**: ${text2.length > maxLength ? `${text2.substring(0, maxLength)}...` : text2}
 `;
   }
-  context += `  <structural_context>
+  context += `- **Structural Context**:
 `;
   if (element.parentElement) {
     const parent = element.parentElement;
-    context += `    <parent>
+    context += `  - **Parent**:
 `;
-    context += `      <tag>${parent.tagName.toLowerCase()}</tag>
+    context += `    - Tag: ${parent.tagName.toLowerCase()}
 `;
     if (parent.id) {
-      context += `      <id>${parent.id}</id>
+      context += `    - ID: ${parent.id}
 `;
     }
     const parentClasses = Array.from(parent.classList).join(", ");
     if (parentClasses) {
-      context += `      <classes>${parentClasses}</classes>
+      context += `    - Classes: ${parentClasses}
 `;
     }
-    context += `    </parent>
-`;
   } else {
-    context += `    <parent>No parent element found (likely root or disconnected)</parent>
+    context += `  - **Parent**: No parent element found (likely root or disconnected)
 `;
   }
-  context += `  </structural_context>
-`;
   try {
     const styles = window.getComputedStyle(element);
     const relevantStyles = {
@@ -144,41 +138,39 @@ function generateElementContext(element, index) {
       fontWeight: styles.fontWeight,
       display: styles.display
     };
-    context += `  <styles>
+    context += `- **Styles**:
 `;
     for (const [key, value] of Object.entries(relevantStyles)) {
-      context += `    <${key}>${value}</${key}>
+      context += `  - ${key}: ${value}
 `;
     }
-    context += `  </styles>
-`;
   } catch (e) {
-    context += `  <styles>Could not retrieve computed styles</styles>
+    context += `- **Styles**: Could not retrieve computed styles
 `;
   }
-  context += `</element>
+  context += `
 `;
   return context;
 }
 function createElementsPrompt(selectedElements, userPrompt) {
   if (!selectedElements || selectedElements.length === 0) {
     return `
-    <request>
-      <user_goal>${userPrompt}</user_goal>
-      <context>No specific element was selected on the page. Please analyze the page code in general or ask for clarification.</context>
-    </request>`.trim();
+# Goal
+${userPrompt}
+
+## Context
+No specific element was selected on the page. Please analyze the page code in general or ask for clarification.`.trim();
   }
   let detailedContext = "";
   selectedElements.forEach((element, index) => {
     detailedContext += generateElementContext(element, index);
   });
   return `
-<request>
-  <user_goal>${userPrompt}</user_goal>
-  <selected_elements>
-    ${detailedContext.trim()}
-  </selected_elements>
-</request>`.trim();
+# Goal
+${userPrompt}
+
+## Selected Elements
+${detailedContext.trim()}`.trim();
 }
 function getMostSpecificElementAtPoint(x, y, excludeSelector) {
   const fullExcludeSelector = excludeSelector ? `${excludeSelector}, .element-selector, [data-element-selector="true"]` : `.element-selector, [data-element-selector="true"]`;
@@ -983,157 +975,11 @@ function ElementInspector({
     )
   ] });
 }
-
-// src/prompting.ts
-function createPromptWithPlugins(selectedElements, userPrompt, url, contextSnippets = []) {
-  const pluginContext = contextSnippets.length > 0 ? contextSnippets.map((snippet) => `
-        <plugin_contexts>
-<${snippet.pluginName}>
-${snippet.contextSnippets.map((snippet2) => `    <${snippet2.promptContextName}>${typeof snippet2.content === "function" ? snippet2.content() : snippet2.content}</${snippet2.promptContextName}>`).join("\n")}
-</${snippet.pluginName}>
-</plugin_contexts>
-        `.trim()).join("\n") : "";
-  if (!selectedElements || selectedElements.length === 0) {
-    return `
-    <request>
-      <user_goal>${userPrompt}</user_goal>
-      <url>${url}</url>
-      <context>No specific element was selected on the page. Please analyze the page code in general or ask for clarification.</context>
-      ${pluginContext}
-    </request>`.trim();
-  }
-  let detailedContext = "";
-  selectedElements.forEach((element, index) => {
-    detailedContext += generateElementContext2(element, index);
-  });
-  return `
-<request>
-  <user_goal>${userPrompt}</user_goal>
-  <url>${url}</url>
-  <selected_elements>
-    ${detailedContext.trim()}
-  </selected_elements>
-  ${pluginContext}
-</request>`.trim();
-}
-function getElementAttributes2(element) {
-  const attrs = {};
-  const priorityAttrs = [
-    "id",
-    "class",
-    "name",
-    "type",
-    "href",
-    "src",
-    "alt",
-    "for",
-    "placeholder"
-  ];
-  const dataAttrs = [];
-  for (let i = 0; i < element.attributes.length; i++) {
-    const attr = element.attributes[i];
-    if (attr.name.startsWith("data-")) {
-      dataAttrs.push({ name: attr.name, value: attr.value });
-    } else if (priorityAttrs.includes(attr.name.toLowerCase()) || attr.name.toLowerCase() !== "style") {
-      attrs[attr.name] = attr.value;
-    }
-  }
-  dataAttrs.forEach((da) => {
-    attrs[da.name] = da.value;
-  });
-  return attrs;
-}
-function generateElementContext2(element, index) {
-  var _a;
-  let context = `<element index="${index + 1}">
-`;
-  context += `  <tag>${element.tagName.toLowerCase()}</tag>
-`;
-  const id = element.id;
-  if (id) {
-    context += `  <id>${id}</id>
-`;
-  }
-  const classes = Array.from(element.classList).join(", ");
-  if (classes) {
-    context += `  <classes>${classes}</classes>
-`;
-  }
-  const attributes = getElementAttributes2(element);
-  if (Object.keys(attributes).length > 0) {
-    context += `  <attributes>
-`;
-    for (const [key, value] of Object.entries(attributes)) {
-      if (key.toLowerCase() !== "class" || !classes) {
-        context += `    <${key}>${value}</${key}>
-`;
-      }
-    }
-    context += `  </attributes>
-`;
-  }
-  const text2 = (_a = element.innerText) == null ? void 0 : _a.trim();
-  if (text2) {
-    const maxLength = 100;
-    context += `  <text>${text2.length > maxLength ? `${text2.substring(0, maxLength)}...` : text2}</text>
-`;
-  }
-  context += `  <structural_context>
-`;
-  if (element.parentElement) {
-    const parent = element.parentElement;
-    context += `    <parent>
-`;
-    context += `      <tag>${parent.tagName.toLowerCase()}</tag>
-`;
-    if (parent.id) {
-      context += `      <id>${parent.id}</id>
-`;
-    }
-    const parentClasses = Array.from(parent.classList).join(", ");
-    if (parentClasses) {
-      context += `      <classes>${parentClasses}</classes>
-`;
-    }
-    context += `    </parent>
-`;
-  } else {
-    context += `    <parent>No parent element found (likely root or disconnected)</parent>
-`;
-  }
-  context += `  </structural_context>
-`;
-  try {
-    const styles = window.getComputedStyle(element);
-    const relevantStyles = {
-      color: styles.color,
-      backgroundColor: styles.backgroundColor,
-      fontSize: styles.fontSize,
-      fontWeight: styles.fontWeight,
-      display: styles.display
-    };
-    context += `  <styles>
-`;
-    for (const [key, value] of Object.entries(relevantStyles)) {
-      context += `    <${key}>${value}</${key}>
-`;
-    }
-    context += `  </styles>
-`;
-  } catch (e) {
-    context += `  <styles>Could not retrieve computed styles</styles>
-`;
-  }
-  context += `</element>
-`;
-  return context;
-}
 export {
   ElementHighlighter,
   ElementInspector,
   ElementSelector,
   createElementsPrompt,
-  createPromptWithPlugins,
   generateElementContext,
   getElementAttributes,
   getMostSpecificElementAtPoint,

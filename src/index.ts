@@ -16,10 +16,3 @@ export {
   isElementAtPoint,
   getMostSpecificElementAtPoint,
 } from './utils';
-
-// Export prompting-related functions and types
-export {
-  createPromptWithPlugins,
-  type ContextSnippet,
-  type PluginContextSnippets,
-} from './prompting';

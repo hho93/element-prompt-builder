@@ -142,53 +142,50 @@ export function getElementAttributes(element: HTMLElement): { [key: string]: str
  * @returns A string containing the element's context
  */
 export function generateElementContext(element: HTMLElement, index: number): string {
-  let context = `<element index="${index + 1}">\n`;
-  context += `  <tag>${element.tagName.toLowerCase()}</tag>\n`;
+  let context = `### Element ${index + 1}\n`;
+  context += `- **Tag**: ${element.tagName.toLowerCase()}\n`;
 
   const id = element.id;
   if (id) {
-    context += `  <id>${id}</id>\n`;
+    context += `- **ID**: ${id}\n`;
   }
 
   const classes = Array.from(element.classList).join(', ');
   if (classes) {
-    context += `  <classes>${classes}</classes>\n`;
+    context += `- **Classes**: ${classes}\n`;
   }
 
   const attributes = getElementAttributes(element);
   if (Object.keys(attributes).length > 0) {
-    context += `  <attributes>\n`;
+    context += `- **Attributes**:\n`;
     for (const [key, value] of Object.entries(attributes)) {
       if (key.toLowerCase() !== 'class' || !classes) {
-        context += `    <${key}>${value}</${key}>\n`;
+        context += `  - ${key}: ${value}\n`;
       }
     }
-    context += `  </attributes>\n`;
   }
 
   const text = element.innerText?.trim();
   if (text) {
     const maxLength = 100;
-    context += `  <text>${text.length > maxLength ? `${text.substring(0, maxLength)}...` : text}</text>\n`;
+    context += `- **Text**: ${text.length > maxLength ? `${text.substring(0, maxLength)}...` : text}\n`;
   }
 
-  context += `  <structural_context>\n`;
+  context += `- **Structural Context**:\n`;
   if (element.parentElement) {
     const parent = element.parentElement;
-    context += `    <parent>\n`;
-    context += `      <tag>${parent.tagName.toLowerCase()}</tag>\n`;
+    context += `  - **Parent**:\n`;
+    context += `    - Tag: ${parent.tagName.toLowerCase()}\n`;
     if (parent.id) {
-      context += `      <id>${parent.id}</id>\n`;
+      context += `    - ID: ${parent.id}\n`;
     }
     const parentClasses = Array.from(parent.classList).join(', ');
     if (parentClasses) {
-      context += `      <classes>${parentClasses}</classes>\n`;
+      context += `    - Classes: ${parentClasses}\n`;
     }
-    context += `    </parent>\n`;
   } else {
-    context += `    <parent>No parent element found (likely root or disconnected)</parent>\n`;
+    context += `  - **Parent**: No parent element found (likely root or disconnected)\n`;
   }
-  context += `  </structural_context>\n`;
 
   try {
     const styles = window.getComputedStyle(element);
@@ -199,16 +196,15 @@ export function generateElementContext(element: HTMLElement, index: number): str
       fontWeight: styles.fontWeight,
       display: styles.display,
     };
-    context += `  <styles>\n`;
+    context += `- **Styles**:\n`;
     for (const [key, value] of Object.entries(relevantStyles)) {
-      context += `    <${key}>${value}</${key}>\n`;
+      context += `  - ${key}: ${value}\n`;
     }
-    context += `  </styles>\n`;
   } catch (e) {
-    context += `  <styles>Could not retrieve computed styles</styles>\n`;
+    context += `- **Styles**: Could not retrieve computed styles\n`;
   }
 
-  context += `</element>\n`;
+  context += `\n`;
   return context;
 }
 
@@ -225,10 +221,11 @@ export function createElementsPrompt(
 ): string {
   if (!selectedElements || selectedElements.length === 0) {
     return `
-    <request>
-      <user_goal>${userPrompt}</user_goal>
-      <context>No specific element was selected on the page. Please analyze the page code in general or ask for clarification.</context>
-    </request>`.trim();
+# Goal
+${userPrompt}
+
+## Context
+No specific element was selected on the page. Please analyze the page code in general or ask for clarification.`.trim();
   }
 
   let detailedContext = '';
@@ -237,12 +234,11 @@ export function createElementsPrompt(
   });
 
   return `
-<request>
-  <user_goal>${userPrompt}</user_goal>
-  <selected_elements>
-    ${detailedContext.trim()}
-  </selected_elements>
-</request>`.trim();
+# Goal
+${userPrompt}
+
+## Selected Elements
+${detailedContext.trim()}`.trim();
 }
 
 /**

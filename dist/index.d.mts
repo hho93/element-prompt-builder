@@ -163,44 +163,4 @@ declare function createElementsPrompt(selectedElements: HTMLElement[], userPromp
  */
 declare function getMostSpecificElementAtPoint(x: number, y: number, excludeSelector?: string): HTMLElement;
 
-/**
- * Types and utilities for creating structured prompts with element context
- */
-/**
- * A context snippet that can be added to a prompt.
- */
-interface ContextSnippet {
-    /**
-     * The name of the context in the prompt
-     */
-    promptContextName: string;
-    /**
-     * The content of the context, either as a string or a function that returns a string or Promise<string>
-     */
-    content: string | (() => string | Promise<string>);
-}
-/**
- * A plugin's context snippets
- */
-interface PluginContextSnippets {
-    /**
-     * The name of the plugin
-     */
-    pluginName: string;
-    /**
-     * The context snippets provided by the plugin
-     */
-    contextSnippets: ContextSnippet[];
-}
-/**
- * Creates a comprehensive prompt for an AI model with element context
- *
- * @param selectedElements - The selected DOM elements
- * @param userPrompt - The user's prompt text
- * @param url - The current page URL
- * @param contextSnippets - Optional additional context snippets from plugins
- * @returns A formatted XML-style prompt
- */
-declare function createPromptWithPlugins(selectedElements: HTMLElement[], userPrompt: string, url: string, contextSnippets?: PluginContextSnippets[]): string;
-
-export { type ContextSnippet, ElementHighlighter, ElementInspector, ElementSelector, type PluginContextSnippets, createElementsPrompt, createPromptWithPlugins, generateElementContext, getElementAttributes, getMostSpecificElementAtPoint, getOffsetsFromPointToElement, getXPathForElement, isElementAtPoint };
+export { ElementHighlighter, ElementInspector, ElementSelector, createElementsPrompt, generateElementContext, getElementAttributes, getMostSpecificElementAtPoint, getOffsetsFromPointToElement, getXPathForElement, isElementAtPoint };
