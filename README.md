@@ -5,10 +5,10 @@ A React component library for inspecting DOM elements and generating structured 
 ## Features
 
 - **Element Selection**: Select DOM elements by clicking on them
-- **Element Highlighting**: Highlight selected elements with customizable styles
+- **Element Highlighting**: Highlight selected elements with visible borders
 - **Element Context**: Generate detailed context information about selected elements
 - **AI Prompt Generation**: Create structured prompts for AI models with element context
-- **Customizable UI**: Fully customizable styles and behavior
+- **Event System**: Cross-frame communication and DOM events for integration
 
 ## Installation
 
@@ -78,7 +78,11 @@ function CustomInspector() {
 import { 
   getXPathForElement, 
   getElementAttributes, 
-  generateElementContext 
+  generateElementContext,
+  getMostSpecificElementAtPoint,
+  isElementAtPoint,
+  getOffsetsFromPointToElement,
+  createElementsPrompt
 } from 'element-prompt-builder';
 
 // Get XPath for an element
@@ -89,6 +93,15 @@ const attributes = getElementAttributes(document.getElementById('myElement'));
 
 // Generate detailed context for an element
 const context = generateElementContext(document.getElementById('myElement'), 0);
+
+// Find the most specific element at a point
+const element = getMostSpecificElementAtPoint(100, 200, '.exclude-me');
+
+// Check if a point is within an element
+const isInElement = isElementAtPoint(document.getElementById('myElement'), 100, 200);
+
+// Get percentage offsets from a point to an element
+const offsets = getOffsetsFromPointToElement(document.getElementById('myElement'), 100, 200);
 ```
 
 ### AI Prompt Generation
@@ -97,22 +110,13 @@ The package includes utilities for generating AI prompts from selected elements:
 
 ```tsx
 import { 
-  generatePrompt, 
-  PromptTemplate 
+  createElementsPrompt
 } from 'element-prompt-builder';
 
-// Create a custom prompt template
-const template: PromptTemplate = {
-  intro: "I'm looking at this UI element:",
-  contextInstructions: "Here's the context of the element:",
-  questionPrompt: "What does this element do?",
-  systemInstructions: "Help me understand this element's purpose and functionality."
-};
-
 // Generate a prompt for an AI model
-const elementPrompt = generatePrompt(
-  document.getElementById('myButton'),
-  template
+const elementPrompt = createElementsPrompt(
+  [document.getElementById('myButton')], // Array of selected elements
+  "Please change this button's background color to blue and make the text bold" // User's question or prompt
 );
 
 // Use this prompt with your preferred AI model
@@ -149,8 +153,6 @@ Component that creates an overlay to select DOM elements.
   excludeSelector={string} // CSS selector for elements to exclude
   className={string} // CSS class for the selector overlay
   style={React.CSSProperties} // Custom styles for the selector overlay
-  useBasicSelection={boolean} // Whether to use basic selection instead of most specific element selection
-  selectionModeToggleKey={string} // Key to toggle selection mode (default: 'Alt')
 />
 ```
 
@@ -170,6 +172,53 @@ Component that highlights a DOM element with a border.
   {/* Optional content to render inside the highlighter */}
 </ElementHighlighter>
 ```
+
+## Event System
+
+The Element Inspector component provides an event system to handle generated prompts in your application.
+
+### Browser Events
+
+When a prompt is generated, the component dispatches a custom DOM event that you can listen for:
+
+```javascript
+// Listen for prompt generation events
+document.addEventListener('promptGenerated', (event) => {
+  const { prompt, elements } = event.detail;
+  console.log('Generated prompt:', prompt);
+  console.log('Selected elements:', elements);
+  
+  // Handle the prompt in your application
+  // For example, send it to an AI model API
+});
+```
+
+### Cross-Frame Communication
+
+When the Element Inspector is used inside an iframe, it communicates with the parent window using the `postMessage` API:
+
+```javascript
+// In the parent window
+window.addEventListener('message', (event) => {
+  // Check if the message is from the Element Inspector
+  if (event.data.type === 'ELEMENT_INSPECTOR_PROMPT') {
+    const { prompt, elements } = event.data.payload;
+    console.log('Generated prompt:', prompt);
+    console.log('Selected elements:', elements);
+    
+    // Handle the prompt in your parent application
+  }
+});
+```
+
+The `elements` array in the message payload contains serialized information about each selected DOM element, including:
+- `tagName`: The HTML tag name
+- `id`: The element's ID attribute
+- `className`: The element's class names
+- `textContent`: The text content of the element
+- `attributes`: An array of the element's attributes (name-value pairs)
+
+This allows you to process the prompt and element information even across different browsing contexts.
 
 ## License
 

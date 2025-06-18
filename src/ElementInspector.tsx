@@ -86,8 +86,6 @@ export function ElementInspector({
   
   // Prompt generation handler
   const onPromptGenerated = useCallback((prompt: string, elements: HTMLElement[]) => {
-    console.log('Generated prompt:', prompt);
-    
     // Create a custom event for local handlers
     const promptEvent = new CustomEvent('promptGenerated', {
       detail: { prompt, elements }
@@ -114,7 +112,6 @@ export function ElementInspector({
           }))
         }
       }, '*');
-      console.log('Sent postMessage to parent window');
     }
   }, []);
   
