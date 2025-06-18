@@ -30,19 +30,11 @@ interface ElementSelectorProps {
      * Custom styles for the selector overlay
      */
     style?: React.CSSProperties;
-    /**
-     * Whether to use basic selection instead of most specific element selection
-     */
-    useBasicSelection?: boolean;
-    /**
-     * Key code to toggle basic/advanced selection mode (default: 'Alt')
-     */
-    selectionModeToggleKey?: string;
 }
 /**
  * ElementSelector component that creates an overlay to select DOM elements
  */
-declare function ElementSelector({ onElementHovered, onElementUnhovered, onElementSelected, ignoreList, excludeSelector, className, style, useBasicSelection, selectionModeToggleKey, }: ElementSelectorProps): react_jsx_runtime.JSX.Element;
+declare function ElementSelector({ onElementHovered, onElementUnhovered, onElementSelected, ignoreList, excludeSelector, className, style, }: ElementSelectorProps): react_jsx_runtime.JSX.Element;
 
 interface ElementHighlighterProps {
     /**
@@ -108,20 +100,11 @@ interface ElementInspectorProps {
 /**
  * A component that allows inspecting and selecting DOM elements with a UI for interaction
  */
-declare function ElementInspector({ initialIsActive, excludeSelector, elementLabel, selectorStyle, highlighterStyle, }: ElementInspectorProps): react_jsx_runtime.JSX.Element;
+declare function ElementInspector({ initialIsActive, excludeSelector, elementLabel, selectorStyle, highlighterStyle, maxElements, }: ElementInspectorProps): react_jsx_runtime.JSX.Element;
 
 /**
  * Utility functions for DOM element inspection and manipulation
  */
-/**
- * Gets the element at the specified point, excluding specific elements
- * @param x - The x coordinate
- * @param y - The y coordinate
- * @param excludeSelector - CSS selector to exclude elements
- * @returns The element at the specified point
- * @deprecated Use getMostSpecificElementAtPoint for better element selection
- */
-declare function getElementAtPoint(x: number, y: number, excludeSelector?: string): HTMLElement;
 /**
  * Checks if a point is within an element's bounds
  * @param element - The element to check
@@ -220,4 +203,4 @@ interface PluginContextSnippets {
  */
 declare function createPromptWithPlugins(selectedElements: HTMLElement[], userPrompt: string, url: string, contextSnippets?: PluginContextSnippets[]): string;
 
-export { type ContextSnippet, ElementHighlighter, ElementInspector, ElementSelector, type PluginContextSnippets, createElementsPrompt, createPromptWithPlugins, generateElementContext, getElementAtPoint, getElementAttributes, getMostSpecificElementAtPoint, getOffsetsFromPointToElement, getXPathForElement, isElementAtPoint };
+export { type ContextSnippet, ElementHighlighter, ElementInspector, ElementSelector, type PluginContextSnippets, createElementsPrompt, createPromptWithPlugins, generateElementContext, getElementAttributes, getMostSpecificElementAtPoint, getOffsetsFromPointToElement, getXPathForElement, isElementAtPoint };

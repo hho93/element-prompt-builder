@@ -3,7 +3,9 @@ import React, { useCallback, useState, useEffect } from 'react';
 import { ElementHighlighter } from './ElementHighlighter';
 import { ElementSelector } from './ElementSelector';
 import { createElementsPrompt } from './utils';
-import { SquareDashedMousePointer, MousePointer, X, Send } from 'lucide-react';
+import { IconX } from './Icons';
+import { layout, buttons, text, darkMode } from './styles';
+import { ElementTagLabel, BubbleMenuButton, InspectorToggle, PromptForm } from './components';
 
 export interface ElementInspectorProps {
   /**
@@ -46,17 +48,43 @@ export function ElementInspector({
   elementLabel,
   selectorStyle,
   highlighterStyle,
+  maxElements = 5,
 }: ElementInspectorProps) {
+  // State hooks
   const [isInspecting, setIsInspecting] = useState(initialIsActive);
   const [hoveredElement, setHoveredElement] = useState<HTMLElement | null>(null);
   const [selectedElements, setSelectedElements] = useState<HTMLElement[]>([]);
   const [userPrompt, setUserPrompt] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   
+  // Check for dark mode on component mount
+  useEffect(() => {
+    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setIsDarkMode(isDark);
+    
+    // Listen for changes in color scheme
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+  
+  // Element selection handlers
   const handleElementsSelected = useCallback((elements: HTMLElement[]) => {
     setSelectedElements(elements);
   }, []);
 
+  const handleElementHovered = useCallback((element: HTMLElement) => {
+    setHoveredElement(element);
+  }, []);
+
+  const handleElementUnhovered = useCallback(() => {
+    setHoveredElement(null);
+  }, []);
+  
+  // Prompt generation handler
   const onPromptGenerated = useCallback((prompt: string, elements: HTMLElement[]) => {
     console.log('Generated prompt:', prompt);
     
@@ -90,25 +118,12 @@ export function ElementInspector({
     }
   }, []);
   
+  // UI interaction handlers
   const toggleInspection = useCallback(() => {
     setIsInspecting(!isInspecting);
     if (isInspecting) {
       setSelectedElements([]);
     }
-  }, [isInspecting]);
-
-  // Handle escape key to exit inspection mode
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isInspecting) {
-        setIsInspecting(false);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
   }, [isInspecting]);
 
   const handleMenuToggle = useCallback(() => {
@@ -134,36 +149,51 @@ export function ElementInspector({
     }
   }, [selectedElements, userPrompt, onPromptGenerated]);
 
-  const handleElementHovered = useCallback((element: HTMLElement) => {
-    setHoveredElement(element);
-  }, []);
+  // Handle escape key to exit inspection mode
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isInspecting) {
+        setIsInspecting(false);
+      }
+    };
 
-  const handleElementUnhovered = useCallback(() => {
-    setHoveredElement(null);
-  }, []);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isInspecting]);
   
+  const elementSelectorProps = {
+    onElementHovered: handleElementHovered,
+    onElementSelected: (element: HTMLElement) => {
+      const isElementSelected = selectedElements.includes(element);
+      
+      // If element is already selected, remove it
+      if (isElementSelected) {
+        const newSelectedElements = selectedElements.filter(el => el !== element);
+        handleElementsSelected(newSelectedElements);
+      } 
+      // If element is not selected and we haven't reached max limit, add it
+      else if (selectedElements.length < maxElements) {
+        const newSelectedElements = [...selectedElements, element];
+        handleElementsSelected(newSelectedElements);
+      }
+      // If we've reached the limit and trying to add another element, don't add it
+      // Could add a visual feedback here if needed
+    },
+    onElementUnhovered: handleElementUnhovered,
+    ignoreList: selectedElements,
+    excludeSelector,
+    style: selectorStyle,
+  };
+
   return (
-    <div className="app">
+    <div>
       {/* Element Inspector Component */}
       {isInspecting && (
         <>
           {/* Element selection overlay */}
-          <ElementSelector
-            onElementHovered={handleElementHovered}
-            onElementSelected={(element) => {
-              const newSelectedElements = selectedElements.includes(element)
-                ? selectedElements.filter(el => el !== element) // Remove if already selected
-                : [...selectedElements, element]; // Add if not selected
-              
-              handleElementsSelected(newSelectedElements);
-            }}
-            onElementUnhovered={handleElementUnhovered}
-            ignoreList={selectedElements}
-            excludeSelector={excludeSelector}
-            style={selectorStyle}
-            useBasicSelection={false}
-            selectionModeToggleKey="Alt"
-          />
+          <ElementSelector {...elementSelectorProps} />
           
           {/* Highlight for hovered element */}
           {hoveredElement && (
@@ -173,23 +203,7 @@ export function ElementInspector({
               backgroundColor="rgba(59, 130, 246, 0.2)"
               style={highlighterStyle}
             >
-              {elementLabel ? (
-                elementLabel(hoveredElement)
-              ) : (
-                <div className="element-tag-label" style={{
-                  position: 'absolute',
-                  top: '0.5px',
-                  left: '0.5px',
-                  backgroundColor: 'rgba(52, 53, 65, 0.8)',
-                  borderRadius: '4px',
-                  padding: '2px 6px',
-                  fontSize: '12px',
-                  color: 'white',
-                  pointerEvents: 'none',
-                }}>
-                  {hoveredElement.tagName.toLowerCase()}
-                </div>
-              )}
+              {elementLabel ? elementLabel(hoveredElement) : <ElementTagLabel element={hoveredElement} />}
             </ElementHighlighter>
           )}
           
@@ -202,112 +216,79 @@ export function ElementInspector({
               backgroundColor="rgba(34, 197, 94, 0.2)"
               style={highlighterStyle}
             >
-              {elementLabel ? (
-                elementLabel(element)
-              ) : (
-                <div className="element-tag-label" style={{
-                  position: 'absolute',
-                  top: '0.5px',
-                  left: '0.5px',
-                  backgroundColor: 'rgba(52, 53, 65, 0.8)',
-                  borderRadius: '4px',
-                  padding: '2px 6px',
-                  fontSize: '12px',
-                  color: 'white',
-                  pointerEvents: 'none',
-                }}>
-                  {element.tagName.toLowerCase()}
-                </div>
-              )}
+              {elementLabel ? elementLabel(element) : <ElementTagLabel element={element} />}
             </ElementHighlighter>
           ))}
         </>
       )}
 
       {/* Bubble Menu */}
-      <div className="fixed bottom-6 right-6 z-[9999] element-inspector-bubble element-inspector-controls">
+      <div 
+        className="element-inspector-bubble element-inspector-controls"
+        style={layout.bubble}
+      >
         {/* Main Menu Button */}
-        <button
-          onClick={handleMenuToggle}
-          className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full shadow-lg transition-all duration-200 element-inspector-controls"
-          title="Element Inspector"
-        >
-          {isMenuOpen ? (
-            <X size={20} />
-          ) : (
-            <SquareDashedMousePointer size={20} />
-          )}
-        </button>
+        <BubbleMenuButton isOpen={isMenuOpen} onClick={handleMenuToggle} />
 
         {/* Expanded Menu */}
         {(isMenuOpen || isInspecting) && (
-          <div className="absolute bottom-16 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 w-[350px] transition-all duration-200 element-inspector-controls">
+          <div 
+            className="element-inspector-controls"
+            style={{
+              ...layout.expandedMenu,
+              ...(isDarkMode ? darkMode.expandedMenu : {})
+            }}
+          >
             {/* Header with Close Button */}
-            <div className="flex justify-between items-center mb-3 element-inspector-controls">
-              <h3 className="text-sm font-medium text-gray-800 dark:text-gray-200">Element Inspector</h3>
+            <div 
+              className="element-inspector-controls"
+              style={layout.menuHeader}
+            >
+              <h3 
+                style={{
+                  ...text.menuTitle,
+                  ...(isDarkMode ? darkMode.menuTitle : {})
+                }}
+              >
+                Element Inspector
+              </h3>
               <button 
                 onClick={handleMenuToggle}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 element-inspector-controls"
+                style={{
+                  ...buttons.closeButton,
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.color = isDarkMode 
+                    ? darkMode.closeButtonHover.color 
+                    : buttons.closeButtonHover.color;
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.color = buttons.closeButton.color;
+                }}
                 aria-label="Close menu"
+                className="element-inspector-controls"
               >
-                <X size={16} />
+                <IconX />
               </button>
             </div>
           
             {/* Inspector Toggle */}
-            <div className="mb-4 flex items-center justify-between element-inspector-controls">
-              <div className="flex items-center gap-2 element-inspector-controls">
-                <MousePointer size={18} className="text-gray-600 dark:text-gray-300" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  Inspection Mode
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                {selectedElements.length > 0 && (
-                  <span className="text-xs font-medium text-green-600 dark:text-green-400">
-                    {selectedElements.length} selected
-                  </span>
-                )}
-                <button
-                  onClick={toggleInspection}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition-colors element-inspector-controls ${
-                    isInspecting 
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' 
-                      : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                  }`}
-                >
-                  {isInspecting ? 'Active' : 'Inactive'}
-                </button>
-              </div>
-            </div>
+            <InspectorToggle 
+              isInspecting={isInspecting}
+              selectedCount={selectedElements.length}
+              toggleInspection={toggleInspection}
+              isDarkMode={isDarkMode}
+              maxElements={maxElements}
+            />
             
             {/* Prompt Input */}
-            <form onSubmit={handlePromptSubmit} className="mt-3 element-inspector-controls">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 element-inspector-controls">
-                Prompt
-              </label>
-              <div className="flex element-inspector-controls">
-                <input
-                  type="text"
-                  value={userPrompt}
-                  onChange={(e) => setUserPrompt(e.target.value)}
-                  className={`flex-1 p-2 text-sm border ${
-                    selectedElements.length > 0 
-                      ? 'border-green-300 dark:border-green-600' 
-                      : 'border-gray-300 dark:border-gray-600'
-                  } rounded-l-md dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 element-inspector-controls`}
-                  placeholder={selectedElements.length > 0 
-                    ? `Enter prompt for ${selectedElements.length} selected element(s)` 
-                    : "Select elements first"}
-                />
-                <button
-                  type="submit"
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-r-md transition-colors element-inspector-controls"
-                >
-                  <Send size={16} />
-                </button>
-              </div>
-            </form>
+            <PromptForm
+              userPrompt={userPrompt}
+              setUserPrompt={setUserPrompt}
+              handlePromptSubmit={handlePromptSubmit}
+              selectedElementsCount={selectedElements.length}
+              isDarkMode={isDarkMode}
+            />
           </div>
         )}
       </div>

@@ -3,24 +3,6 @@
  */
 
 /**
- * Gets the element at the specified point, excluding specific elements
- * @param x - The x coordinate
- * @param y - The y coordinate
- * @param excludeSelector - CSS selector to exclude elements
- * @returns The element at the specified point
- * @deprecated Use getMostSpecificElementAtPoint for better element selection
- */
-export function getElementAtPoint(
-  x: number, 
-  y: number, 
-  excludeSelector?: string
-): HTMLElement {
-  // This function is now a wrapper around getMostSpecificElementAtPoint
-  // for backward compatibility
-  return getMostSpecificElementAtPoint(x, y, excludeSelector);
-}
-
-/**
  * Checks if a point is within an element's bounds
  * @param element - The element to check
  * @param clientX - The x coordinate

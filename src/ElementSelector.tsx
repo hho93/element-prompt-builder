@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback, useRef } from 'react';
-import { getElementAtPoint, getMostSpecificElementAtPoint } from './utils';
+import { getMostSpecificElementAtPoint } from './utils';
 
 export interface ElementSelectorProps {
   /**
@@ -37,16 +37,6 @@ export interface ElementSelectorProps {
    * Custom styles for the selector overlay
    */
   style?: React.CSSProperties;
-  
-  /**
-   * Whether to use basic selection instead of most specific element selection
-   */
-  useBasicSelection?: boolean;
-  
-  /**
-   * Key code to toggle basic/advanced selection mode (default: 'Alt')
-   */
-  selectionModeToggleKey?: string;
 }
 
 /**
@@ -60,34 +50,8 @@ export function ElementSelector({
   excludeSelector = '',
   className = '',
   style = {},
-  useBasicSelection = false,
-  selectionModeToggleKey = 'Alt',
 }: ElementSelectorProps) {
   const lastHoveredElement = useRef<HTMLElement | null>(null);
-  const [isUsingBasicSelection, setIsUsingBasicSelection] = React.useState(useBasicSelection);
-
-  // Handle key down/up for the selection mode toggle
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === selectionModeToggleKey) {
-        setIsUsingBasicSelection(true);
-      }
-    };
-    
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === selectionModeToggleKey) {
-        setIsUsingBasicSelection(false);
-      }
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [selectionModeToggleKey]);
 
   const handleMouseMove = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -100,9 +64,7 @@ export function ElementSelector({
       }
       
       // Get element at this point (with overlay hidden)
-      const refElement = isUsingBasicSelection 
-        ? getElementAtPoint(clientX, clientY, excludeSelector)
-        : getMostSpecificElementAtPoint(clientX, clientY, excludeSelector);
+      const refElement = getMostSpecificElementAtPoint(clientX, clientY, excludeSelector);
       
       // Restore the overlay
       if (overlayElement) {
@@ -124,7 +86,7 @@ export function ElementSelector({
         onElementHovered(refElement);
       }
     },
-    [onElementHovered, ignoreList, excludeSelector, isUsingBasicSelection]
+    [onElementHovered, ignoreList, excludeSelector]
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -147,9 +109,7 @@ export function ElementSelector({
       }
       
       // Get the most accurate element at click position
-      const clickedElement = isUsingBasicSelection
-        ? getElementAtPoint(clientX, clientY, excludeSelector)
-        : getMostSpecificElementAtPoint(clientX, clientY, excludeSelector);
+      const clickedElement = getMostSpecificElementAtPoint(clientX, clientY, excludeSelector);
       
       // Restore the overlay
       if (overlayElement) {
@@ -168,7 +128,7 @@ export function ElementSelector({
       lastHoveredElement.current = clickedElement;
       onElementSelected(clickedElement);
     },
-    [onElementSelected, ignoreList, excludeSelector, isUsingBasicSelection]
+    [onElementSelected, ignoreList, excludeSelector]
   );
 
   return (
@@ -180,7 +140,7 @@ export function ElementSelector({
         inset: 0,
         height: '100vh',
         width: '100vw',
-        cursor: isUsingBasicSelection ? 'crosshair' : 'cell',
+        cursor: 'cell',
         zIndex: 9999,
         pointerEvents: 'auto',
         ...style,
@@ -190,22 +150,6 @@ export function ElementSelector({
       onClick={handleMouseClick}
       role="button"
       tabIndex={0}
-    >
-      {isUsingBasicSelection && (
-        <div style={{
-          position: 'fixed',
-          bottom: '10px',
-          right: '10px',
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-          color: 'white',
-          padding: '5px 10px',
-          borderRadius: '4px',
-          fontSize: '12px',
-          pointerEvents: 'none'
-        }}>
-          Basic Selection Mode (Press Alt to toggle)
-        </div>
-      )}
-    </div>
+    />
   );
 }

@@ -8,7 +8,6 @@ export { ElementSelector } from './ElementSelector';
 export { ElementHighlighter } from './ElementHighlighter';
 export { ElementInspector } from './ElementInspector';
 export {
-  getElementAtPoint,
   getOffsetsFromPointToElement,
   getXPathForElement,
   getElementAttributes,

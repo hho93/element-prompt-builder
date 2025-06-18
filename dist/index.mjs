@@ -1,10 +1,7 @@
 // src/ElementSelector.tsx
-import React, { useCallback, useRef } from "react";
+import { useCallback, useRef } from "react";
 
 // src/utils.ts
-function getElementAtPoint(x, y, excludeSelector) {
-  return getMostSpecificElementAtPoint(x, y, excludeSelector);
-}
 var isElementAtPoint = (element, clientX, clientY) => {
   const boundingRect = element.getBoundingClientRect();
   const isInHorizontalBounds = clientX >= boundingRect.left && clientX <= boundingRect.left + boundingRect.width;
@@ -107,10 +104,10 @@ function generateElementContext(element, index) {
     context += `  </attributes>
 `;
   }
-  const text = (_a = element.innerText) == null ? void 0 : _a.trim();
-  if (text) {
+  const text2 = (_a = element.innerText) == null ? void 0 : _a.trim();
+  if (text2) {
     const maxLength = 100;
-    context += `  <text>${text.length > maxLength ? `${text.substring(0, maxLength)}...` : text}</text>
+    context += `  <text>${text2.length > maxLength ? `${text2.substring(0, maxLength)}...` : text2}</text>
 `;
   }
   context += `  <structural_context>
@@ -185,8 +182,8 @@ function createElementsPrompt(selectedElements, userPrompt) {
 }
 function getMostSpecificElementAtPoint(x, y, excludeSelector) {
   const fullExcludeSelector = excludeSelector ? `${excludeSelector}, .element-selector, [data-element-selector="true"]` : `.element-selector, [data-element-selector="true"]`;
-  const elements = document.elementsFromPoint(x, y);
-  const eligibleElements = elements.filter((element) => {
+  const elements2 = document.elementsFromPoint(x, y);
+  const eligibleElements = elements2.filter((element) => {
     if (fullExcludeSelector && (element.matches(fullExcludeSelector) || element.closest(fullExcludeSelector))) {
       return false;
     }
@@ -239,30 +236,9 @@ function ElementSelector({
   ignoreList = [],
   excludeSelector = "",
   className = "",
-  style = {},
-  useBasicSelection = false,
-  selectionModeToggleKey = "Alt"
+  style = {}
 }) {
   const lastHoveredElement = useRef(null);
-  const [isUsingBasicSelection, setIsUsingBasicSelection] = React.useState(useBasicSelection);
-  React.useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === selectionModeToggleKey) {
-        setIsUsingBasicSelection(true);
-      }
-    };
-    const handleKeyUp = (e) => {
-      if (e.key === selectionModeToggleKey) {
-        setIsUsingBasicSelection(false);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
-    };
-  }, [selectionModeToggleKey]);
   const handleMouseMove = useCallback(
     (event) => {
       const { clientX, clientY } = event;
@@ -270,7 +246,7 @@ function ElementSelector({
       if (overlayElement) {
         overlayElement.style.pointerEvents = "none";
       }
-      const refElement = isUsingBasicSelection ? getElementAtPoint(clientX, clientY, excludeSelector) : getMostSpecificElementAtPoint(clientX, clientY, excludeSelector);
+      const refElement = getMostSpecificElementAtPoint(clientX, clientY, excludeSelector);
       if (overlayElement) {
         overlayElement.style.pointerEvents = "auto";
       }
@@ -283,7 +259,7 @@ function ElementSelector({
         onElementHovered(refElement);
       }
     },
-    [onElementHovered, ignoreList, excludeSelector, isUsingBasicSelection]
+    [onElementHovered, ignoreList, excludeSelector]
   );
   const handleMouseLeave = useCallback(() => {
     lastHoveredElement.current = null;
@@ -298,7 +274,7 @@ function ElementSelector({
       if (overlayElement) {
         overlayElement.style.pointerEvents = "none";
       }
-      const clickedElement = isUsingBasicSelection ? getElementAtPoint(clientX, clientY, excludeSelector) : getMostSpecificElementAtPoint(clientX, clientY, excludeSelector);
+      const clickedElement = getMostSpecificElementAtPoint(clientX, clientY, excludeSelector);
       if (overlayElement) {
         overlayElement.style.pointerEvents = "auto";
       }
@@ -308,7 +284,7 @@ function ElementSelector({
       lastHoveredElement.current = clickedElement;
       onElementSelected(clickedElement);
     },
-    [onElementSelected, ignoreList, excludeSelector, isUsingBasicSelection]
+    [onElementSelected, ignoreList, excludeSelector]
   );
   return /* @__PURE__ */ jsx(
     "div",
@@ -320,7 +296,7 @@ function ElementSelector({
         inset: 0,
         height: "100vh",
         width: "100vw",
-        cursor: isUsingBasicSelection ? "crosshair" : "cell",
+        cursor: "cell",
         zIndex: 9999,
         pointerEvents: "auto",
         ...style
@@ -329,18 +305,7 @@ function ElementSelector({
       onMouseLeave: handleMouseLeave,
       onClick: handleMouseClick,
       role: "button",
-      tabIndex: 0,
-      children: isUsingBasicSelection && /* @__PURE__ */ jsx("div", { style: {
-        position: "fixed",
-        bottom: "10px",
-        right: "10px",
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
-        color: "white",
-        padding: "5px 10px",
-        borderRadius: "4px",
-        fontSize: "12px",
-        pointerEvents: "none"
-      }, children: "Basic Selection Mode (Press Alt to toggle)" })
+      tabIndex: 0
     }
   );
 }
@@ -416,27 +381,427 @@ function ElementHighlighter({
 
 // src/ElementInspector.tsx
 import { useCallback as useCallback3, useState, useEffect as useEffect2 } from "react";
-import { SquareDashedMousePointer, MousePointer, X, Send } from "lucide-react";
-import { Fragment, jsx as jsx3, jsxs } from "react/jsx-runtime";
+
+// src/Icons.tsx
+import { jsx as jsx3, jsxs } from "react/jsx-runtime";
+var IconPointer = () => /* @__PURE__ */ jsxs("svg", { xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "lucide lucide-mouse-pointer-click-icon lucide-mouse-pointer-click", children: [
+  /* @__PURE__ */ jsx3("path", { d: "M14 4.1 12 6" }),
+  /* @__PURE__ */ jsx3("path", { d: "m5.1 8-2.9-.8" }),
+  /* @__PURE__ */ jsx3("path", { d: "m6 12-1.9 2" }),
+  /* @__PURE__ */ jsx3("path", { d: "M7.2 2.2 8 5.1" }),
+  /* @__PURE__ */ jsx3("path", { d: "M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z" })
+] });
+var IconSquareDashedPointer = () => /* @__PURE__ */ jsxs("svg", { xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "lucide lucide-square-dashed-mouse-pointer-icon lucide-square-dashed-mouse-pointer", children: [
+  /* @__PURE__ */ jsx3("path", { d: "M12.034 12.681a.498.498 0 0 1 .647-.647l9 3.5a.5.5 0 0 1-.033.943l-3.444 1.068a1 1 0 0 0-.66.66l-1.067 3.443a.5.5 0 0 1-.943.033z" }),
+  /* @__PURE__ */ jsx3("path", { d: "M5 3a2 2 0 0 0-2 2" }),
+  /* @__PURE__ */ jsx3("path", { d: "M19 3a2 2 0 0 1 2 2" }),
+  /* @__PURE__ */ jsx3("path", { d: "M5 21a2 2 0 0 1-2-2" }),
+  /* @__PURE__ */ jsx3("path", { d: "M9 3h1" }),
+  /* @__PURE__ */ jsx3("path", { d: "M9 21h2" }),
+  /* @__PURE__ */ jsx3("path", { d: "M14 3h1" }),
+  /* @__PURE__ */ jsx3("path", { d: "M3 9v1" }),
+  /* @__PURE__ */ jsx3("path", { d: "M21 9v2" }),
+  /* @__PURE__ */ jsx3("path", { d: "M3 14v1" })
+] });
+var IconX = () => /* @__PURE__ */ jsxs("svg", { xmlns: "http://www.w3.org/2000/svg", width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+  /* @__PURE__ */ jsx3("line", { x1: "18", y1: "6", x2: "6", y2: "18" }),
+  /* @__PURE__ */ jsx3("line", { x1: "6", y1: "6", x2: "18", y2: "18" })
+] });
+var IconSend = () => /* @__PURE__ */ jsxs("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+  /* @__PURE__ */ jsx3("path", { d: "m22 2-7 20-4-9-9-4Z" }),
+  /* @__PURE__ */ jsx3("path", { d: "M22 2 11 13" })
+] });
+
+// src/styles.ts
+var layout = {
+  bubble: {
+    position: "fixed",
+    bottom: "24px",
+    right: "24px",
+    zIndex: 9999
+  },
+  expandedMenu: {
+    position: "absolute",
+    bottom: "64px",
+    right: "0",
+    backgroundColor: "white",
+    borderRadius: "8px",
+    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+    padding: "16px",
+    width: "350px",
+    transition: "all 0.2s ease"
+  },
+  menuHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "12px"
+  },
+  inspectorToggle: {
+    marginBottom: "16px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between"
+  },
+  toggleLeft: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px"
+  },
+  toggleRight: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px"
+  },
+  promptForm: {
+    marginTop: "12px"
+  },
+  inputContainer: {
+    display: "flex"
+  }
+};
+var buttons = {
+  mainButton: {
+    backgroundColor: "#3b82f6",
+    color: "white",
+    padding: "12px",
+    borderRadius: "50%",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    border: "none",
+    cursor: "pointer",
+    transition: "all 0.2s ease"
+  },
+  mainButtonHover: {
+    backgroundColor: "#2563eb"
+  },
+  closeButton: {
+    color: "#6b7280",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    padding: "4px"
+  },
+  closeButtonHover: {
+    color: "#374151"
+  },
+  toggleButton: {
+    padding: "4px 12px",
+    borderRadius: "9999px",
+    fontSize: "12px",
+    fontWeight: "500",
+    border: "none",
+    cursor: "pointer",
+    transition: "colors 0.2s ease"
+  },
+  submitButton: {
+    backgroundColor: "#3b82f6",
+    color: "white",
+    padding: "8px 12px",
+    borderTopRightRadius: "6px",
+    borderBottomRightRadius: "6px",
+    border: "none",
+    cursor: "pointer",
+    transition: "background-color 0.2s ease"
+  },
+  submitButtonHover: {
+    backgroundColor: "#2563eb"
+  }
+};
+var text = {
+  menuTitle: {
+    fontSize: "14px",
+    fontWeight: "500",
+    color: "#1f2937"
+  },
+  toggleText: {
+    fontSize: "14px",
+    fontWeight: "500",
+    color: "#374151"
+  },
+  selectedCount: {
+    fontSize: "12px",
+    fontWeight: "500",
+    color: "#10b981"
+  },
+  promptLabel: {
+    display: "block",
+    fontSize: "14px",
+    fontWeight: "500",
+    color: "#374151",
+    marginBottom: "4px"
+  }
+};
+var inputs = {
+  promptInput: {
+    flexGrow: 1,
+    padding: "8px",
+    fontSize: "14px",
+    border: "1px solid #d1d5db",
+    borderTopLeftRadius: "6px",
+    borderBottomLeftRadius: "6px",
+    outline: "none",
+    borderColor: "#d1d5db"
+  },
+  promptInputFocus: {
+    borderColor: "#3b82f6",
+    boxShadow: "0 0 0 1px rgba(59, 130, 246, 0.5)"
+  },
+  promptInputSelected: {
+    borderColor: "#10b981"
+  }
+};
+var elements = {
+  elementTagLabel: {
+    position: "absolute",
+    top: "0.5px",
+    left: "0.5px",
+    backgroundColor: "rgba(52, 53, 65, 0.8)",
+    borderRadius: "4px",
+    padding: "2px 6px",
+    fontSize: "12px",
+    color: "white",
+    pointerEvents: "none"
+  }
+};
+var states = {
+  toggleButtonActive: {
+    backgroundColor: "#dcfce7",
+    color: "#065f46"
+  },
+  toggleButtonInactive: {
+    backgroundColor: "#f3f4f6",
+    color: "#1f2937"
+  }
+};
+var darkMode = {
+  expandedMenu: {
+    backgroundColor: "#1f2937"
+  },
+  menuTitle: {
+    color: "#e5e7eb"
+  },
+  closeButtonHover: {
+    color: "#e5e7eb"
+  },
+  toggleText: {
+    color: "#e5e7eb"
+  },
+  selectedCount: {
+    color: "#34d399"
+  },
+  toggleButtonActive: {
+    backgroundColor: "#064e3b",
+    color: "#ecfdf5"
+  },
+  toggleButtonInactive: {
+    backgroundColor: "#374151",
+    color: "#d1d5db"
+  },
+  promptLabel: {
+    color: "#d1d5db"
+  },
+  promptInput: {
+    backgroundColor: "#374151",
+    color: "white",
+    borderColor: "#4b5563"
+  }
+};
+
+// src/components.tsx
+import { jsx as jsx4, jsxs as jsxs2 } from "react/jsx-runtime";
+var ElementTagLabel = ({ element }) => /* @__PURE__ */ jsx4("div", { style: elements.elementTagLabel, children: element.tagName.toLowerCase() });
+var BubbleMenuButton = ({ isOpen, onClick }) => /* @__PURE__ */ jsx4(
+  "button",
+  {
+    onClick,
+    style: buttons.mainButton,
+    onMouseOver: (e) => {
+      e.currentTarget.style.backgroundColor = buttons.mainButtonHover.backgroundColor;
+    },
+    onMouseOut: (e) => {
+      e.currentTarget.style.backgroundColor = buttons.mainButton.backgroundColor;
+    },
+    title: "Element Inspector",
+    className: "element-inspector-controls",
+    children: isOpen ? /* @__PURE__ */ jsx4(IconX, {}) : /* @__PURE__ */ jsx4(IconSquareDashedPointer, {})
+  }
+);
+var InspectorToggle = ({
+  isInspecting,
+  selectedCount,
+  toggleInspection,
+  isDarkMode,
+  maxElements = 5
+}) => /* @__PURE__ */ jsxs2(
+  "div",
+  {
+    className: "element-inspector-controls",
+    style: layout.inspectorToggle,
+    children: [
+      /* @__PURE__ */ jsxs2(
+        "div",
+        {
+          className: "element-inspector-controls",
+          style: layout.toggleLeft,
+          children: [
+            /* @__PURE__ */ jsx4(IconPointer, {}),
+            /* @__PURE__ */ jsx4(
+              "span",
+              {
+                style: {
+                  ...text.toggleText,
+                  ...isDarkMode ? darkMode.toggleText : {}
+                },
+                children: "Inspection Mode"
+              }
+            )
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxs2("div", { style: layout.toggleRight, children: [
+        selectedCount > 0 && /* @__PURE__ */ jsxs2(
+          "span",
+          {
+            style: {
+              ...text.selectedCount,
+              ...isDarkMode ? darkMode.selectedCount : {}
+            },
+            children: [
+              selectedCount,
+              "/",
+              maxElements,
+              " selected"
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsx4(
+          "button",
+          {
+            onClick: toggleInspection,
+            style: {
+              ...buttons.toggleButton,
+              ...isInspecting ? isDarkMode ? { ...darkMode.toggleButtonActive } : { ...states.toggleButtonActive } : isDarkMode ? { ...darkMode.toggleButtonInactive } : { ...states.toggleButtonInactive }
+            },
+            className: "element-inspector-controls",
+            children: isInspecting ? "Active" : "Inactive"
+          }
+        )
+      ] })
+    ]
+  }
+);
+var PromptForm = ({
+  userPrompt,
+  setUserPrompt,
+  handlePromptSubmit,
+  selectedElementsCount,
+  isDarkMode
+}) => /* @__PURE__ */ jsxs2(
+  "form",
+  {
+    onSubmit: handlePromptSubmit,
+    style: layout.promptForm,
+    className: "element-inspector-controls",
+    children: [
+      /* @__PURE__ */ jsx4(
+        "label",
+        {
+          style: {
+            ...text.promptLabel,
+            ...isDarkMode ? darkMode.promptLabel : {}
+          },
+          className: "element-inspector-controls",
+          children: "Prompt"
+        }
+      ),
+      /* @__PURE__ */ jsxs2(
+        "div",
+        {
+          style: layout.inputContainer,
+          className: "element-inspector-controls",
+          children: [
+            /* @__PURE__ */ jsx4(
+              "input",
+              {
+                type: "text",
+                value: userPrompt,
+                onChange: (e) => setUserPrompt(e.target.value),
+                style: {
+                  ...inputs.promptInput,
+                  ...isDarkMode ? darkMode.promptInput : {},
+                  ...selectedElementsCount > 0 ? inputs.promptInputSelected : {}
+                },
+                onFocus: (e) => {
+                  e.currentTarget.style.boxShadow = inputs.promptInputFocus.boxShadow;
+                  e.currentTarget.style.borderColor = inputs.promptInputFocus.borderColor;
+                },
+                onBlur: (e) => {
+                  e.currentTarget.style.boxShadow = "none";
+                  e.currentTarget.style.borderColor = selectedElementsCount > 0 ? inputs.promptInputSelected.borderColor : isDarkMode ? darkMode.promptInput.borderColor : inputs.promptInput.borderColor;
+                },
+                placeholder: selectedElementsCount > 0 ? `Enter prompt for ${selectedElementsCount} selected element(s)` : "Select elements first",
+                className: "element-inspector-controls"
+              }
+            ),
+            /* @__PURE__ */ jsx4(
+              "button",
+              {
+                type: "submit",
+                style: buttons.submitButton,
+                onMouseOver: (e) => {
+                  e.currentTarget.style.backgroundColor = buttons.submitButtonHover.backgroundColor;
+                },
+                onMouseOut: (e) => {
+                  e.currentTarget.style.backgroundColor = buttons.submitButton.backgroundColor;
+                },
+                className: "element-inspector-controls",
+                children: /* @__PURE__ */ jsx4(IconSend, {})
+              }
+            )
+          ]
+        }
+      )
+    ]
+  }
+);
+
+// src/ElementInspector.tsx
+import { Fragment, jsx as jsx5, jsxs as jsxs3 } from "react/jsx-runtime";
 function ElementInspector({
   initialIsActive = false,
   excludeSelector = ".element-inspector-bubble, .element-inspector-controls",
   elementLabel,
   selectorStyle,
-  highlighterStyle
+  highlighterStyle,
+  maxElements = 5
 }) {
   const [isInspecting, setIsInspecting] = useState(initialIsActive);
   const [hoveredElement, setHoveredElement] = useState(null);
   const [selectedElements, setSelectedElements] = useState([]);
   const [userPrompt, setUserPrompt] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const handleElementsSelected = useCallback3((elements) => {
-    setSelectedElements(elements);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  useEffect2(() => {
+    const isDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    setIsDarkMode(isDark);
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (e) => setIsDarkMode(e.matches);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
-  const onPromptGenerated = useCallback3((prompt, elements) => {
+  const handleElementsSelected = useCallback3((elements2) => {
+    setSelectedElements(elements2);
+  }, []);
+  const handleElementHovered = useCallback3((element) => {
+    setHoveredElement(element);
+  }, []);
+  const handleElementUnhovered = useCallback3(() => {
+    setHoveredElement(null);
+  }, []);
+  const onPromptGenerated = useCallback3((prompt, elements2) => {
     console.log("Generated prompt:", prompt);
     const promptEvent = new CustomEvent("promptGenerated", {
-      detail: { prompt, elements }
+      detail: { prompt, elements: elements2 }
     });
     document.dispatchEvent(promptEvent);
     const isInIframe = window.self !== window.top;
@@ -445,7 +810,7 @@ function ElementInspector({
         type: "ELEMENT_INSPECTOR_PROMPT",
         payload: {
           prompt,
-          elements: elements.map((el) => {
+          elements: elements2.map((el) => {
             var _a;
             return {
               tagName: el.tagName,
@@ -469,17 +834,6 @@ function ElementInspector({
       setSelectedElements([]);
     }
   }, [isInspecting]);
-  useEffect2(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape" && isInspecting) {
-        setIsInspecting(false);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isInspecting]);
   const handleMenuToggle = useCallback3(() => {
     setIsMenuOpen(!isMenuOpen);
     setIsInspecting(!isMenuOpen);
@@ -495,140 +849,138 @@ function ElementInspector({
       setUserPrompt("");
     }
   }, [selectedElements, userPrompt, onPromptGenerated]);
-  const handleElementHovered = useCallback3((element) => {
-    setHoveredElement(element);
-  }, []);
-  const handleElementUnhovered = useCallback3(() => {
-    setHoveredElement(null);
-  }, []);
-  return /* @__PURE__ */ jsxs("div", { className: "app", children: [
-    isInspecting && /* @__PURE__ */ jsxs(Fragment, { children: [
-      /* @__PURE__ */ jsx3(
-        ElementSelector,
-        {
-          onElementHovered: handleElementHovered,
-          onElementSelected: (element) => {
-            const newSelectedElements = selectedElements.includes(element) ? selectedElements.filter((el) => el !== element) : [...selectedElements, element];
-            handleElementsSelected(newSelectedElements);
-          },
-          onElementUnhovered: handleElementUnhovered,
-          ignoreList: selectedElements,
-          excludeSelector,
-          style: selectorStyle,
-          useBasicSelection: false,
-          selectionModeToggleKey: "Alt"
-        }
-      ),
-      hoveredElement && /* @__PURE__ */ jsx3(
+  useEffect2(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape" && isInspecting) {
+        setIsInspecting(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isInspecting]);
+  const elementSelectorProps = {
+    onElementHovered: handleElementHovered,
+    onElementSelected: (element) => {
+      const isElementSelected = selectedElements.includes(element);
+      if (isElementSelected) {
+        const newSelectedElements = selectedElements.filter((el) => el !== element);
+        handleElementsSelected(newSelectedElements);
+      } else if (selectedElements.length < maxElements) {
+        const newSelectedElements = [...selectedElements, element];
+        handleElementsSelected(newSelectedElements);
+      }
+    },
+    onElementUnhovered: handleElementUnhovered,
+    ignoreList: selectedElements,
+    excludeSelector,
+    style: selectorStyle
+  };
+  return /* @__PURE__ */ jsxs3("div", { children: [
+    isInspecting && /* @__PURE__ */ jsxs3(Fragment, { children: [
+      /* @__PURE__ */ jsx5(ElementSelector, { ...elementSelectorProps }),
+      hoveredElement && /* @__PURE__ */ jsx5(
         ElementHighlighter,
         {
           element: hoveredElement,
           borderColor: "rgba(59, 130, 246, 0.8)",
           backgroundColor: "rgba(59, 130, 246, 0.2)",
           style: highlighterStyle,
-          children: elementLabel ? elementLabel(hoveredElement) : /* @__PURE__ */ jsx3("div", { className: "element-tag-label", style: {
-            position: "absolute",
-            top: "0.5px",
-            left: "0.5px",
-            backgroundColor: "rgba(52, 53, 65, 0.8)",
-            borderRadius: "4px",
-            padding: "2px 6px",
-            fontSize: "12px",
-            color: "white",
-            pointerEvents: "none"
-          }, children: hoveredElement.tagName.toLowerCase() })
+          children: elementLabel ? elementLabel(hoveredElement) : /* @__PURE__ */ jsx5(ElementTagLabel, { element: hoveredElement })
         }
       ),
-      selectedElements.map((element, index) => /* @__PURE__ */ jsx3(
+      selectedElements.map((element, index) => /* @__PURE__ */ jsx5(
         ElementHighlighter,
         {
           element,
           borderColor: "rgba(34, 197, 94, 0.8)",
           backgroundColor: "rgba(34, 197, 94, 0.2)",
           style: highlighterStyle,
-          children: elementLabel ? elementLabel(element) : /* @__PURE__ */ jsx3("div", { className: "element-tag-label", style: {
-            position: "absolute",
-            top: "0.5px",
-            left: "0.5px",
-            backgroundColor: "rgba(52, 53, 65, 0.8)",
-            borderRadius: "4px",
-            padding: "2px 6px",
-            fontSize: "12px",
-            color: "white",
-            pointerEvents: "none"
-          }, children: element.tagName.toLowerCase() })
+          children: elementLabel ? elementLabel(element) : /* @__PURE__ */ jsx5(ElementTagLabel, { element })
         },
         `selected-${index}`
       ))
     ] }),
-    /* @__PURE__ */ jsxs("div", { className: "fixed bottom-6 right-6 z-[9999] element-inspector-bubble element-inspector-controls", children: [
-      /* @__PURE__ */ jsx3(
-        "button",
-        {
-          onClick: handleMenuToggle,
-          className: "bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full shadow-lg transition-all duration-200 element-inspector-controls",
-          title: "Element Inspector",
-          children: isMenuOpen ? /* @__PURE__ */ jsx3(X, { size: 20 }) : /* @__PURE__ */ jsx3(SquareDashedMousePointer, { size: 20 })
-        }
-      ),
-      (isMenuOpen || isInspecting) && /* @__PURE__ */ jsxs("div", { className: "absolute bottom-16 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 w-[350px] transition-all duration-200 element-inspector-controls", children: [
-        /* @__PURE__ */ jsxs("div", { className: "flex justify-between items-center mb-3 element-inspector-controls", children: [
-          /* @__PURE__ */ jsx3("h3", { className: "text-sm font-medium text-gray-800 dark:text-gray-200", children: "Element Inspector" }),
-          /* @__PURE__ */ jsx3(
-            "button",
+    /* @__PURE__ */ jsxs3(
+      "div",
+      {
+        className: "element-inspector-bubble element-inspector-controls",
+        style: layout.bubble,
+        children: [
+          /* @__PURE__ */ jsx5(BubbleMenuButton, { isOpen: isMenuOpen, onClick: handleMenuToggle }),
+          (isMenuOpen || isInspecting) && /* @__PURE__ */ jsxs3(
+            "div",
             {
-              onClick: handleMenuToggle,
-              className: "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 element-inspector-controls",
-              "aria-label": "Close menu",
-              children: /* @__PURE__ */ jsx3(X, { size: 16 })
+              className: "element-inspector-controls",
+              style: {
+                ...layout.expandedMenu,
+                ...isDarkMode ? darkMode.expandedMenu : {}
+              },
+              children: [
+                /* @__PURE__ */ jsxs3(
+                  "div",
+                  {
+                    className: "element-inspector-controls",
+                    style: layout.menuHeader,
+                    children: [
+                      /* @__PURE__ */ jsx5(
+                        "h3",
+                        {
+                          style: {
+                            ...text.menuTitle,
+                            ...isDarkMode ? darkMode.menuTitle : {}
+                          },
+                          children: "Element Inspector"
+                        }
+                      ),
+                      /* @__PURE__ */ jsx5(
+                        "button",
+                        {
+                          onClick: handleMenuToggle,
+                          style: {
+                            ...buttons.closeButton
+                          },
+                          onMouseOver: (e) => {
+                            e.currentTarget.style.color = isDarkMode ? darkMode.closeButtonHover.color : buttons.closeButtonHover.color;
+                          },
+                          onMouseOut: (e) => {
+                            e.currentTarget.style.color = buttons.closeButton.color;
+                          },
+                          "aria-label": "Close menu",
+                          className: "element-inspector-controls",
+                          children: /* @__PURE__ */ jsx5(IconX, {})
+                        }
+                      )
+                    ]
+                  }
+                ),
+                /* @__PURE__ */ jsx5(
+                  InspectorToggle,
+                  {
+                    isInspecting,
+                    selectedCount: selectedElements.length,
+                    toggleInspection,
+                    isDarkMode,
+                    maxElements
+                  }
+                ),
+                /* @__PURE__ */ jsx5(
+                  PromptForm,
+                  {
+                    userPrompt,
+                    setUserPrompt,
+                    handlePromptSubmit,
+                    selectedElementsCount: selectedElements.length,
+                    isDarkMode
+                  }
+                )
+              ]
             }
           )
-        ] }),
-        /* @__PURE__ */ jsxs("div", { className: "mb-4 flex items-center justify-between element-inspector-controls", children: [
-          /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 element-inspector-controls", children: [
-            /* @__PURE__ */ jsx3(MousePointer, { size: 18, className: "text-gray-600 dark:text-gray-300" }),
-            /* @__PURE__ */ jsx3("span", { className: "text-sm font-medium text-gray-700 dark:text-gray-200", children: "Inspection Mode" })
-          ] }),
-          /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
-            selectedElements.length > 0 && /* @__PURE__ */ jsxs("span", { className: "text-xs font-medium text-green-600 dark:text-green-400", children: [
-              selectedElements.length,
-              " selected"
-            ] }),
-            /* @__PURE__ */ jsx3(
-              "button",
-              {
-                onClick: toggleInspection,
-                className: `px-3 py-1 rounded-full text-xs font-medium transition-colors element-inspector-controls ${isInspecting ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100" : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"}`,
-                children: isInspecting ? "Active" : "Inactive"
-              }
-            )
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxs("form", { onSubmit: handlePromptSubmit, className: "mt-3 element-inspector-controls", children: [
-          /* @__PURE__ */ jsx3("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 element-inspector-controls", children: "Prompt" }),
-          /* @__PURE__ */ jsxs("div", { className: "flex element-inspector-controls", children: [
-            /* @__PURE__ */ jsx3(
-              "input",
-              {
-                type: "text",
-                value: userPrompt,
-                onChange: (e) => setUserPrompt(e.target.value),
-                className: `flex-1 p-2 text-sm border ${selectedElements.length > 0 ? "border-green-300 dark:border-green-600" : "border-gray-300 dark:border-gray-600"} rounded-l-md dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 element-inspector-controls`,
-                placeholder: selectedElements.length > 0 ? `Enter prompt for ${selectedElements.length} selected element(s)` : "Select elements first"
-              }
-            ),
-            /* @__PURE__ */ jsx3(
-              "button",
-              {
-                type: "submit",
-                className: "bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-r-md transition-colors element-inspector-controls",
-                children: /* @__PURE__ */ jsx3(Send, { size: 16 })
-              }
-            )
-          ] })
-        ] })
-      ] })
-    ] })
+        ]
+      }
+    )
   ] });
 }
 
@@ -720,10 +1072,10 @@ function generateElementContext2(element, index) {
     context += `  </attributes>
 `;
   }
-  const text = (_a = element.innerText) == null ? void 0 : _a.trim();
-  if (text) {
+  const text2 = (_a = element.innerText) == null ? void 0 : _a.trim();
+  if (text2) {
     const maxLength = 100;
-    context += `  <text>${text.length > maxLength ? `${text.substring(0, maxLength)}...` : text}</text>
+    context += `  <text>${text2.length > maxLength ? `${text2.substring(0, maxLength)}...` : text2}</text>
 `;
   }
   context += `  <structural_context>
@@ -783,7 +1135,6 @@ export {
   createElementsPrompt,
   createPromptWithPlugins,
   generateElementContext,
-  getElementAtPoint,
   getElementAttributes,
   getMostSpecificElementAtPoint,
   getOffsetsFromPointToElement,

@@ -46,8 +46,7 @@ You can also use the individual components for more control:
 import { useState } from 'react';
 import { 
   ElementSelector, 
-  ElementHighlighter, 
-  getElementAtPoint 
+  ElementHighlighter
 } from 'element-prompt-builder';
 
 function CustomInspector() {
