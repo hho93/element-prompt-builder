@@ -139,10 +139,21 @@ export function getElementAttributes(element: HTMLElement): { [key: string]: str
  * Generates a detailed context string for a single HTMLElement
  * @param element - The element to generate context for
  * @param index - The index of the element
+ * @param totalElements - The total number of elements
  * @returns A string containing the element's context
  */
-export function generateElementContext(element: HTMLElement, index: number): string {
-  let context = `### Element ${index + 1}\n`;
+export function generateElementContext(
+  element: HTMLElement,
+  index: number,
+  totalElements: number,
+): string {
+  let context = "";
+  
+  // Only add element numbering if there are multiple elements
+  if (totalElements > 1) {
+    context += `### Element ${index + 1}\n`;
+  }
+  
   context += `- **Tag**: ${element.tagName.toLowerCase()}\n`;
 
   const id = element.id;
@@ -228,14 +239,19 @@ No specific element was selected on the page. Please analyze the page code in ge
   }
 
   let detailedContext = '';
+  const totalElements = selectedElements.length;
+  
   selectedElements.forEach((element, index) => {
-    detailedContext += generateElementContext(element, index);
+    detailedContext += generateElementContext(element, index, totalElements);
   });
+
+  // Use singular or plural based on number of selected elements
+  const sectionHeader = totalElements > 1 ? '## Selected Elements' : '## Selected Element';
 
   return `
 ${userPrompt}
 
-## Selected Elements
+${sectionHeader}
 ${detailedContext.trim()}`.trim();
 }
 

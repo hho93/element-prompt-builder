@@ -4,20 +4,18 @@
 export const layout = {
   bubble: {
     position: 'fixed' as const,
-    bottom: '24px',
-    right: '24px',
     zIndex: 9999,
+    // Dynamic positioning will be handled in the component
   },
   expandedMenu: {
-    position: 'absolute' as const,
-    bottom: '64px',
-    right: '0',
     backgroundColor: 'white',
     borderRadius: '8px',
     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
     padding: '16px',
-    width: '350px',
-    transition: 'all 0.2s ease',
+    width: '300px',
+    transition: 'all 0.15s ease-in-out',
+    zIndex: 9999,
+    position: 'relative',
   },
   menuHeader: {
     display: 'flex',
@@ -54,7 +52,7 @@ export const buttons = {
   mainButton: {
     backgroundColor: '#3b82f6',
     color: 'white',
-    padding: '12px',
+    padding: '8px',
     borderRadius: '50%',
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
     border: 'none',
@@ -86,9 +84,8 @@ export const buttons = {
   submitButton: {
     backgroundColor: '#3b82f6',
     color: 'white',
-    padding: '8px 12px',
-    borderTopRightRadius: '6px',
-    borderBottomRightRadius: '6px',
+    padding: '8px',
+    borderRadius: '6px',
     border: 'none',
     cursor: 'pointer',
     transition: 'background-color 0.2s ease',
@@ -128,13 +125,10 @@ export const text = {
 export const inputs = {
   promptInput: {
     flexGrow: 1,
-    padding: '8px',
+    minHeight: "40px",
     fontSize: '14px',
-    border: '1px solid #d1d5db',
-    borderTopLeftRadius: '6px',
-    borderBottomLeftRadius: '6px',
     outline: 'none',
-    borderColor: '#d1d5db',
+    fontFamily: 'inherit',
   },
   promptInputFocus: {
     borderColor: '#3b82f6',
@@ -157,6 +151,16 @@ export const elements = {
     fontSize: '12px',
     color: 'white',
     pointerEvents: 'none' as const,
+  },
+  menuArrow: {
+    position: 'absolute' as const,
+    width: 0,
+    height: 0,
+    borderLeft: '8px solid transparent',
+    borderRight: '8px solid transparent',
+    zIndex: 10001,
+    transform: 'translateX(-8px)',
+    transition: 'all 0.15s ease-in-out',
   },
 };
 

@@ -81,10 +81,6 @@ interface ElementInspectorProps {
      */
     excludeSelector?: string;
     /**
-     * Maximum number of elements that can be selected
-     */
-    maxElements?: number;
-    /**
      * Custom label for selected elements
      */
     elementLabel?: (element: HTMLElement) => React.ReactNode;
@@ -100,7 +96,7 @@ interface ElementInspectorProps {
 /**
  * A component that allows inspecting and selecting DOM elements with a UI for interaction
  */
-declare function ElementInspector({ initialIsActive, excludeSelector, elementLabel, selectorStyle, highlighterStyle, maxElements, }: ElementInspectorProps): react_jsx_runtime.JSX.Element;
+declare function ElementInspector({ initialIsActive, excludeSelector, elementLabel, selectorStyle, highlighterStyle, }: ElementInspectorProps): react_jsx_runtime.JSX.Element;
 
 /**
  * Utility functions for DOM element inspection and manipulation
@@ -143,9 +139,10 @@ declare function getElementAttributes(element: HTMLElement): {
  * Generates a detailed context string for a single HTMLElement
  * @param element - The element to generate context for
  * @param index - The index of the element
+ * @param totalElements - The total number of elements
  * @returns A string containing the element's context
  */
-declare function generateElementContext(element: HTMLElement, index: number): string;
+declare function generateElementContext(element: HTMLElement, index: number, totalElements: number): string;
 /**
  * Creates a prompt containing information about the selected elements
  * @param selectedElements - The selected elements
