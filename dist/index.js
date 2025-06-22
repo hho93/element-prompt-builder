@@ -469,7 +469,8 @@ var buttons = {
     transition: "all 0.2s ease",
     display: "flex",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    padding: "8px"
   },
   mainButtonHover: {
     backgroundColor: "#2563eb"
@@ -509,18 +510,19 @@ var buttons = {
 var inputs = {
   promptInput: {
     flexGrow: 1,
-    minHeight: "40px",
+    minHeight: "30px",
     fontSize: "14px",
     outline: "none",
     fontFamily: "inherit",
-    borderColor: "transparent"
+    borderColor: "transparent",
+    padding: 0
   },
   promptInputFocus: {
     borderColor: "#3b82f6",
     boxShadow: "0 0 0 1px rgba(59, 130, 246, 0.5)"
   },
   promptInputSelected: {
-    borderColor: "#10b981"
+    borderColor: "transparent"
   }
 };
 var elements = {
@@ -576,7 +578,7 @@ var darkMode = {
   promptInput: {
     backgroundColor: "#374151",
     color: "white",
-    borderColor: "#4b5563"
+    borderColor: "transparent"
   }
 };
 
