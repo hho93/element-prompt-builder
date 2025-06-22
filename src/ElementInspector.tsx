@@ -191,7 +191,6 @@ export function ElementInspector({
                 zIndex: 10000,
                 maxHeight: '400px',
                 overflowY: 'auto',
-                height: '75px',
               }}
             >
               {/* Prompt Input */}

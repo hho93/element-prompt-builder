@@ -52,12 +52,14 @@ export const buttons = {
   mainButton: {
     backgroundColor: '#3b82f6',
     color: 'white',
-    padding: '8px',
     borderRadius: '50%',
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
     border: 'none',
     cursor: 'pointer',
     transition: 'all 0.2s ease',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   mainButtonHover: {
     backgroundColor: '#2563eb',
@@ -129,6 +131,7 @@ export const inputs = {
     fontSize: '14px',
     outline: 'none',
     fontFamily: 'inherit',
+    borderColor: 'transparent'
   },
   promptInputFocus: {
     borderColor: '#3b82f6',

@@ -462,12 +462,14 @@ var buttons = {
   mainButton: {
     backgroundColor: "#3b82f6",
     color: "white",
-    padding: "8px",
     borderRadius: "50%",
     boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
     border: "none",
     cursor: "pointer",
-    transition: "all 0.2s ease"
+    transition: "all 0.2s ease",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
   },
   mainButtonHover: {
     backgroundColor: "#2563eb"
@@ -510,7 +512,8 @@ var inputs = {
     minHeight: "40px",
     fontSize: "14px",
     outline: "none",
-    fontFamily: "inherit"
+    fontFamily: "inherit",
+    borderColor: "transparent"
   },
   promptInputFocus: {
     borderColor: "#3b82f6",
@@ -1018,8 +1021,7 @@ function ElementInspector({
                   left: `${bubblePosition.left}px`,
                   zIndex: 1e4,
                   maxHeight: "400px",
-                  overflowY: "auto",
-                  height: "75px"
+                  overflowY: "auto"
                 },
                 children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
                   PromptForm,

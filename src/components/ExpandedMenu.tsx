@@ -65,7 +65,6 @@ export function ExpandedMenu({
         zIndex: 10000,
         maxHeight: '400px', // Ensure it doesn't get too large
         overflowY: 'auto', // Add scrolling if needed
-        height: '75px', // Set actual height to match our calculations
       }}
     >
       {/* Prompt Input */}
