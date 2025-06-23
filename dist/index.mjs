@@ -901,7 +901,7 @@ function ElementInspector({
   } = useInspector({
     initialIsActive,
     onPromptGenerated: (prompt, elements2) => {
-      if (1) {
+      if (isInIframe) {
         sendPrompt(prompt, elements2);
       }
     }

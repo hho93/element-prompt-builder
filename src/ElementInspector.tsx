@@ -89,7 +89,7 @@ export function ElementInspector({
     initialIsActive,
     onPromptGenerated: (prompt, elements) => {
       // Send prompt to parent frame if in iframe
-      if (1) {
+      if (isInIframe) {
         sendPrompt(prompt, elements);
       }
     }
