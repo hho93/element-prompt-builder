@@ -37,6 +37,12 @@ export interface ElementSelectorProps {
    * Custom styles for the selector overlay
    */
   style?: React.CSSProperties;
+  
+  /**
+   * Custom filter function for elements
+   * Return true to allow selection, false to prevent
+   */
+  elementFilter?: (element: HTMLElement) => boolean;
 }
 
 /**
@@ -50,6 +56,7 @@ export function ElementSelector({
   excludeSelector = '',
   className = '',
   style = {},
+  elementFilter,
 }: ElementSelectorProps) {
   const lastHoveredElement = useRef<HTMLElement | null>(null);
 
@@ -80,13 +87,18 @@ export function ElementSelector({
         return;
       }
       
+      // Apply custom element filter if provided
+      if (elementFilter && !elementFilter(refElement)) {
+        return;
+      }
+      
       // Only trigger callback if the hovered element has changed
       if (lastHoveredElement.current !== refElement) {
         lastHoveredElement.current = refElement;
         onElementHovered(refElement);
       }
     },
-    [onElementHovered, ignoreList, excludeSelector]
+    [onElementHovered, ignoreList, excludeSelector, elementFilter]
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -124,11 +136,16 @@ export function ElementSelector({
         return;
       }
       
+      // Apply custom element filter if provided
+      if (elementFilter && !elementFilter(clickedElement)) {
+        return;
+      }
+      
       // Update last hovered element and trigger selection
       lastHoveredElement.current = clickedElement;
       onElementSelected(clickedElement);
     },
-    [onElementSelected, ignoreList, excludeSelector]
+    [onElementSelected, ignoreList, excludeSelector, elementFilter]
   );
 
   return (

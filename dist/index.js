@@ -266,7 +266,8 @@ function ElementSelector({
   ignoreList = [],
   excludeSelector = "",
   className = "",
-  style = {}
+  style = {},
+  elementFilter
 }) {
   const lastHoveredElement = (0, import_react.useRef)(null);
   const handleMouseMove = (0, import_react.useCallback)(
@@ -284,12 +285,15 @@ function ElementSelector({
       if (refElement === overlayElement || overlayElement && overlayElement.contains(refElement)) {
         return;
       }
+      if (elementFilter && !elementFilter(refElement)) {
+        return;
+      }
       if (lastHoveredElement.current !== refElement) {
         lastHoveredElement.current = refElement;
         onElementHovered(refElement);
       }
     },
-    [onElementHovered, ignoreList, excludeSelector]
+    [onElementHovered, ignoreList, excludeSelector, elementFilter]
   );
   const handleMouseLeave = (0, import_react.useCallback)(() => {
     lastHoveredElement.current = null;
@@ -311,10 +315,13 @@ function ElementSelector({
       if (clickedElement === overlayElement || overlayElement && overlayElement.contains(clickedElement)) {
         return;
       }
+      if (elementFilter && !elementFilter(clickedElement)) {
+        return;
+      }
       lastHoveredElement.current = clickedElement;
       onElementSelected(clickedElement);
     },
-    [onElementSelected, ignoreList, excludeSelector]
+    [onElementSelected, ignoreList, excludeSelector, elementFilter]
   );
   return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
     "div",
@@ -424,7 +431,7 @@ var layout = {
     borderRadius: "8px",
     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
     padding: "16px",
-    width: "300px",
+    width: "350px",
     transition: "all 0.15s ease-in-out",
     zIndex: 9999,
     position: "relative"
@@ -510,12 +517,13 @@ var buttons = {
 var inputs = {
   promptInput: {
     flexGrow: 1,
-    minHeight: "30px",
+    minHeight: "65px",
     fontSize: "14px",
     outline: "none",
     fontFamily: "inherit",
     borderColor: "transparent",
-    padding: 0
+    padding: 0,
+    width: "100%"
   },
   promptInputFocus: {
     borderColor: "#3b82f6",
@@ -597,6 +605,11 @@ var IconSquareDashedPointer = () => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs
   /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M3 14v1" })
 ] });
 var IconTick = () => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("polyline", { points: "20 6 9 17 4 12" }) });
+var IconAi = () => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("svg", { width: "23", height: "23", viewBox: "0 0 23 23", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: [
+  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M9.55507 5.34461L10.1322 6.94742C10.7733 8.72633 12.1742 10.1272 13.9531 10.7683L15.5559 11.3455C15.7004 11.3979 15.7004 11.6028 15.5559 11.6545L13.9531 12.2317C12.1742 12.8728 10.7733 14.2736 10.1322 16.0525L9.55507 17.6554C9.5026 17.7998 9.29776 17.7998 9.24601 17.6554L8.66885 16.0525C8.02772 14.2736 6.62688 12.8728 4.84797 12.2317L3.24516 11.6545C3.10069 11.602 3.10069 11.3972 3.24516 11.3455L4.84797 10.7683C6.62688 10.1272 8.02772 8.72633 8.66885 6.94742L9.24601 5.34461C9.29776 5.19942 9.5026 5.19942 9.55507 5.34461Z", fill: "black" }),
+  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M16.7699 1.49284L17.0624 2.30431C17.3873 3.2049 18.0967 3.91431 18.9973 4.23918L19.8088 4.53172C19.8821 4.55831 19.8821 4.66181 19.8088 4.6884L18.9973 4.98093C18.0967 5.30581 17.3873 6.01521 17.0624 6.91581L16.7699 7.72728C16.7433 7.80059 16.6398 7.80059 16.6132 7.72728L16.3207 6.91581C15.9958 6.01521 15.2864 5.30581 14.3858 4.98093L13.5743 4.6884C13.501 4.66181 13.501 4.55831 13.5743 4.53172L14.3858 4.23918C15.2864 3.91431 15.9958 3.2049 16.3207 2.30431L16.6132 1.49284C16.6398 1.41881 16.744 1.41881 16.7699 1.49284Z", fill: "black" }),
+  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M16.7699 15.2734L17.0624 16.0849C17.3873 16.9855 18.0967 17.6949 18.9973 18.0198L19.8088 18.3123C19.8821 18.3389 19.8821 18.4424 19.8088 18.469L18.9973 18.7615C18.0967 19.0864 17.3873 19.7958 17.0624 20.6964L16.7699 21.5079C16.7433 21.5812 16.6398 21.5812 16.6132 21.5079L16.3207 20.6964C15.9958 19.7958 15.2864 19.0864 14.3858 18.7615L13.5743 18.469C13.501 18.4424 13.501 18.3389 13.5743 18.3123L14.3858 18.0198C15.2864 17.6949 15.9958 16.9855 16.3207 16.0849L16.6132 15.2734C16.6398 15.2001 16.744 15.2001 16.7699 15.2734Z", fill: "black" })
+] });
 
 // src/components/BubbleMenuButton.tsx
 var import_jsx_runtime4 = require("react/jsx-runtime");
@@ -652,21 +665,33 @@ function PromptForm({
         width: "100%"
       },
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-          "textarea",
-          {
-            value: userPrompt,
-            onChange: (e) => setUserPrompt(e.target.value),
-            style: {
-              ...inputs.promptInput,
-              ...isDarkMode ? darkMode.promptInput : {},
-              ...selectedElementsCount > 0 ? inputs.promptInputSelected : {},
-              resize: "none"
-            },
-            placeholder: "Enter your prompt about the selected element..."
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: {
+          display: "flex",
+          alignItems: "flex-start",
+          position: "relative",
+          gap: "5px",
+          width: "100%"
+        }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "mt-1", children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(IconAi, {}) }),
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+            "textarea",
+            {
+              value: userPrompt,
+              onChange: (e) => setUserPrompt(e.target.value),
+              style: {
+                ...inputs.promptInput,
+                ...isDarkMode ? darkMode.promptInput : {},
+                ...selectedElementsCount > 0 ? inputs.promptInputSelected : {},
+                resize: "none",
+                minHeight: "62px",
+                // Height for approximately 3 lines
+                lineHeight: "1.5"
+              },
+              placeholder: "Tell me how to modify this element...\nI can help change its style, content, or behavior."
+            }
+          )
+        ] }),
+        userPrompt.trim() !== "" && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
           "button",
           {
             type: "submit",
@@ -692,6 +717,23 @@ function PromptForm({
   ) });
 }
 
+// src/constants.ts
+var UI_CONSTANTS = {
+  // Menu dimensions
+  MENU_WIDTH: 350,
+  // Width of the control menu in pixels
+  MENU_HEIGHT: 94,
+  // Height of the control menu in pixels
+  // Spacing and offsets
+  SPACING: 10,
+  // Standard spacing for margins and padding
+  ARROW_LEFT_OFFSET: 20,
+  // Left offset for the arrow from menu edge
+  // Z-index values
+  Z_INDEX: 1e4
+  // Standard z-index for UI elements
+};
+
 // src/hooks/useDarkMode.ts
 var import_react3 = require("react");
 function useDarkMode() {
@@ -711,11 +753,15 @@ function useDarkMode() {
 var import_react4 = require("react");
 function useElementBubblePosition({
   selectedElements,
-  menuHeight = 75,
-  menuWidth = 300,
-  spacing = 10
+  menuHeight = UI_CONSTANTS.MENU_HEIGHT,
+  menuWidth = UI_CONSTANTS.MENU_WIDTH,
+  spacing = UI_CONSTANTS.SPACING
 }) {
-  const [bubblePosition, setBubblePosition] = (0, import_react4.useState)({ top: 0, left: 0, arrowOffset: 20 });
+  const [bubblePosition, setBubblePosition] = (0, import_react4.useState)({
+    top: 0,
+    left: 0,
+    arrowOffset: UI_CONSTANTS.ARROW_LEFT_OFFSET
+  });
   const [isMenuAboveElement, setIsMenuAboveElement] = (0, import_react4.useState)(false);
   (0, import_react4.useEffect)(() => {
     if (selectedElements.length === 0) return;
@@ -728,7 +774,7 @@ function useElementBubblePosition({
       const isNearBottom = rect.bottom + menuHeight + spacing * 2 > viewportHeight;
       setIsMenuAboveElement(isNearBottom);
       let top = isNearBottom ? rect.top + window.scrollY - menuHeight - spacing : rect.bottom + window.scrollY + spacing;
-      let left = rect.left + rect.width / 2 - menuWidth / 2 + window.scrollX;
+      let left = rect.left + window.scrollX;
       if (isNearBottom && rect.top < menuHeight + spacing * 2) {
         const spaceRight = viewportWidth - rect.right;
         if (spaceRight >= menuWidth + spacing * 2) {
@@ -800,6 +846,43 @@ function useElementSelection({ onElementsSelected } = {}) {
 var import_react6 = require("react");
 function useIframeMessaging() {
   const isInIframe = typeof window !== "undefined" && window.self !== window.top;
+  const [activeTab, setActiveTab] = (0, import_react6.useState)(null);
+  const [shouldEnableInspect, setShouldEnableInspect] = (0, import_react6.useState)(!isInIframe);
+  const [onlySelectButtons, setOnlySelectButtons] = (0, import_react6.useState)(false);
+  (0, import_react6.useEffect)(() => {
+    if (!isInIframe) return;
+    const handleMessage = (event) => {
+      var _a;
+      if (((_a = event.data) == null ? void 0 : _a.type) === "TAB_CHANGED") {
+        const { activeTab: newActiveTab } = event.data.payload || {};
+        setActiveTab(newActiveTab);
+        if (newActiveTab === "chat") {
+          setShouldEnableInspect(false);
+        } else if (newActiveTab === "design" || newActiveTab === "workflow") {
+          setShouldEnableInspect(true);
+          setOnlySelectButtons(newActiveTab === "workflow");
+        }
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [isInIframe]);
+  const elementFilter = (0, import_react6.useCallback)((element) => {
+    if (onlySelectButtons) {
+      const isButtonElement = element.tagName.toLowerCase() === "button";
+      const hasButtonRole = element.getAttribute("role") === "button";
+      const hasButtonType = element.getAttribute("type") === "button" || element.getAttribute("type") === "submit" || element.getAttribute("type") === "reset";
+      const classNames = element.className.toLowerCase();
+      const hasButtonClass = classNames.includes("btn") || classNames.includes("button") || classNames.includes("-btn-") || classNames.includes("submit") || classNames.includes("action");
+      const computedStyle = window.getComputedStyle(element);
+      const hasCursorPointer = computedStyle.cursor === "pointer";
+      const hasOnClickAttr = element.hasAttribute("onclick") || element.hasAttribute("ng-click") || element.hasAttribute("@click");
+      return isButtonElement || hasButtonRole || hasButtonType || hasButtonClass || hasCursorPointer && hasOnClickAttr;
+    }
+    return true;
+  }, [onlySelectButtons]);
   const sendSelectedElements = (0, import_react6.useCallback)((elements2) => {
     if (!isInIframe) return;
     window.parent.postMessage({
@@ -827,6 +910,7 @@ function useIframeMessaging() {
       type: "ELEMENT_INSPECTOR_PROMPT",
       payload: {
         prompt,
+        activeTab,
         elements: elements2.map((el) => {
           var _a;
           return {
@@ -842,11 +926,15 @@ function useIframeMessaging() {
         })
       }
     }, "*");
-  }, [isInIframe]);
+  }, [isInIframe, activeTab]);
   return {
     isInIframe,
     sendSelectedElements,
-    sendPrompt
+    sendPrompt,
+    activeTab,
+    shouldEnableInspect,
+    elementFilter,
+    onlySelectButtons
   };
 }
 
@@ -903,10 +991,17 @@ function ElementInspector({
   excludeSelector = ".element-inspector-bubble, .element-inspector-controls",
   elementLabel,
   selectorStyle,
-  highlighterStyle
+  highlighterStyle,
+  showBubbleMenuButton = false
 }) {
   const isDarkMode = useDarkMode();
-  const { isInIframe, sendSelectedElements, sendPrompt } = useIframeMessaging();
+  const {
+    isInIframe,
+    sendSelectedElements,
+    sendPrompt,
+    shouldEnableInspect,
+    elementFilter
+  } = useIframeMessaging();
   const {
     hoveredElement,
     selectedElements,
@@ -923,9 +1018,9 @@ function ElementInspector({
   });
   const { bubblePosition, isMenuAboveElement } = useElementBubblePosition({
     selectedElements,
-    menuHeight: 75,
-    menuWidth: 300,
-    spacing: 10
+    menuHeight: UI_CONSTANTS.MENU_HEIGHT,
+    menuWidth: UI_CONSTANTS.MENU_WIDTH,
+    spacing: UI_CONSTANTS.SPACING
   });
   const {
     isInspecting,
@@ -934,7 +1029,8 @@ function ElementInspector({
     toggleInspection,
     handlePromptSubmit
   } = useInspector({
-    initialIsActive,
+    // Use shouldEnableInspect from iframe messaging if in iframe, otherwise use initialIsActive
+    initialIsActive: isInIframe ? shouldEnableInspect : initialIsActive,
     onPromptGenerated: (prompt, elements2) => {
       if (isInIframe) {
         sendPrompt(prompt, elements2);
@@ -950,13 +1046,20 @@ function ElementInspector({
   const onSubmitPrompt = (0, import_react8.useCallback)((e) => {
     handlePromptSubmit(e, selectedElements);
   }, [handlePromptSubmit, selectedElements]);
+  (0, import_react8.useEffect)(() => {
+    if (isInIframe && isInspecting !== shouldEnableInspect) {
+      toggleInspection();
+    }
+  }, [isInIframe, isInspecting, shouldEnableInspect, toggleInspection]);
   const elementSelectorProps = {
     onElementHovered: handleElementHovered,
     onElementSelected: handleElementSelected,
     onElementUnhovered: handleElementUnhovered,
     ignoreList: selectedElements,
     excludeSelector,
-    style: selectorStyle
+    style: selectorStyle,
+    elementFilter: isInIframe ? elementFilter : void 0
+    // Only apply filter when in iframe
   };
   return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { children: [
     isInspecting && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
@@ -999,9 +1102,10 @@ function ElementInspector({
               {
                 style: {
                   ...elements.menuArrow,
-                  top: isMenuAboveElement ? `${bubblePosition.top + 75}px` : `${bubblePosition.top - 8}px`,
+                  top: isMenuAboveElement ? `${bubblePosition.top + UI_CONSTANTS.MENU_HEIGHT}px` : `${bubblePosition.top - 8}px`,
                   // Arrow at top of menu
-                  left: `${bubblePosition.left + bubblePosition.arrowOffset}px`,
+                  left: `${bubblePosition.left + UI_CONSTANTS.ARROW_LEFT_OFFSET}px`,
+                  // Fixed left position with small offset from menu edge
                   borderTop: isMenuAboveElement ? `8px solid ${isDarkMode ? "#1f2937" : "white"}` : "none",
                   borderBottom: isMenuAboveElement ? "none" : `8px solid ${isDarkMode ? "#1f2937" : "white"}`,
                   pointerEvents: "none",
@@ -1021,7 +1125,7 @@ function ElementInspector({
                   position: "fixed",
                   top: `${bubblePosition.top}px`,
                   left: `${bubblePosition.left}px`,
-                  zIndex: 1e4,
+                  zIndex: UI_CONSTANTS.Z_INDEX,
                   maxHeight: "400px",
                   overflowY: "auto"
                 },
@@ -1038,11 +1142,11 @@ function ElementInspector({
               }
             )
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { style: {
+          showBubbleMenuButton && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { style: {
             position: "fixed",
             bottom: "24px",
             right: "24px",
-            zIndex: 1e4
+            zIndex: UI_CONSTANTS.Z_INDEX
           }, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
             BubbleMenuButton,
             {

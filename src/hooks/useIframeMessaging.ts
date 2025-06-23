@@ -1,19 +1,77 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-interface ElementData {
-  tagName: string;
-  id: string;
-  className: string;
-  textContent: string | null;
-  attributes: Array<{ name: string; value: string }>;
-}
+type TabType = 'chat' | 'design' | 'workflow' | null;
 
 /**
  * Custom hook to handle cross-frame communication
  */
 export function useIframeMessaging() {
-  // Detect if component is inside an iframe
   const isInIframe = typeof window !== 'undefined' && window.self !== window.top;
+  const [activeTab, setActiveTab] = useState<TabType>(null);
+  const [shouldEnableInspect, setShouldEnableInspect] = useState<boolean>(!isInIframe);
+  const [onlySelectButtons, setOnlySelectButtons] = useState<boolean>(false);
+  
+  // Effect to listen for messages from the parent window
+  useEffect(() => {
+    if (!isInIframe) return;
+    
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'TAB_CHANGED') {
+        const { activeTab: newActiveTab } = event.data.payload || {};
+        
+        setActiveTab(newActiveTab as TabType);
+        
+        // Disable inspect mode for chat tab
+        if (newActiveTab === 'chat') {
+          setShouldEnableInspect(false);
+        }
+        // Enable inspect mode for design and workflow tabs
+        else if (newActiveTab === 'design' || newActiveTab === 'workflow') {
+          setShouldEnableInspect(true);
+          // Only allow button selection in workflow tab
+          setOnlySelectButtons(newActiveTab === 'workflow');
+        }
+      }
+    };
+    
+    window.addEventListener('message', handleMessage);
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [isInIframe]);
+  
+  // Element filter function based on active tab
+  const elementFilter = useCallback((element: HTMLElement): boolean => {
+    // If in workflow tab, only allow button elements
+    if (onlySelectButtons) {
+      // Check if element is a button or has button-like characteristics
+      const isButtonElement = element.tagName.toLowerCase() === 'button';
+      const hasButtonRole = element.getAttribute('role') === 'button';
+      const hasButtonType = element.getAttribute('type') === 'button' || 
+                           element.getAttribute('type') === 'submit' || 
+                           element.getAttribute('type') === 'reset';
+      
+      // Check for common button class names
+      const classNames = element.className.toLowerCase();
+      const hasButtonClass = classNames.includes('btn') || 
+                           classNames.includes('button') ||
+                           classNames.includes('-btn-') ||
+                           classNames.includes('submit') ||
+                           classNames.includes('action');
+      
+      // Check for clickable elements with pointer cursor
+      const computedStyle = window.getComputedStyle(element);
+      const hasCursorPointer = computedStyle.cursor === 'pointer';
+      
+      // Check for elements with event listeners (approximation)
+      const hasOnClickAttr = element.hasAttribute('onclick') || element.hasAttribute('ng-click') || element.hasAttribute('@click');
+      
+      // If any of these conditions are met, consider it a button
+      return isButtonElement || hasButtonRole || hasButtonType || hasButtonClass || (hasCursorPointer && hasOnClickAttr);
+    }
+    // Otherwise allow all elements
+    return true;
+  }, [onlySelectButtons]);
   
   // Send selected elements to parent window
   const sendSelectedElements = useCallback((elements: HTMLElement[]) => {
@@ -44,6 +102,7 @@ export function useIframeMessaging() {
       type: 'ELEMENT_INSPECTOR_PROMPT',
       payload: {
         prompt,
+        activeTab,
         elements: elements.map(el => ({
           tagName: el.tagName,
           id: el.id,
@@ -56,11 +115,15 @@ export function useIframeMessaging() {
         }))
       }
     }, '*');
-  }, [isInIframe]);
+  }, [isInIframe, activeTab]);
   
   return {
     isInIframe,
     sendSelectedElements,
-    sendPrompt
+    sendPrompt,
+    activeTab,
+    shouldEnableInspect,
+    elementFilter,
+    onlySelectButtons
   };
 }

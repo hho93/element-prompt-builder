@@ -1,9 +1,10 @@
 "use client";
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { BubbleMenuButton, ElementTagLabel, PromptForm } from './components/';
 import { ElementHighlighter } from './ElementHighlighter';
 import { ElementSelector } from './ElementSelector';
 import { darkMode, elements, layout } from './styles';
+import { UI_CONSTANTS } from './constants';
 import {
   useDarkMode,
   useElementBubblePosition,
@@ -37,6 +38,12 @@ export interface ElementInspectorProps {
    * Custom styles for the highlighter
    */
   highlighterStyle?: React.CSSProperties;
+  
+  /**
+   * Whether to show the floating bubble menu button
+   * @default false
+   */
+  showBubbleMenuButton?: boolean;
 }
 
 /**
@@ -48,10 +55,17 @@ export function ElementInspector({
   elementLabel,
   selectorStyle,
   highlighterStyle,
+  showBubbleMenuButton = false,
 }: ElementInspectorProps) {
   // Custom hooks
   const isDarkMode = useDarkMode();
-  const { isInIframe, sendSelectedElements, sendPrompt } = useIframeMessaging();
+  const { 
+    isInIframe, 
+    sendSelectedElements, 
+    sendPrompt,
+    shouldEnableInspect,
+    elementFilter
+  } = useIframeMessaging();
   
   // Element selection hook
   const { 
@@ -73,9 +87,9 @@ export function ElementInspector({
   // Bubble position hook
   const { bubblePosition, isMenuAboveElement } = useElementBubblePosition({
     selectedElements,
-    menuHeight: 75,
-    menuWidth: 300,
-    spacing: 10
+    menuHeight: UI_CONSTANTS.MENU_HEIGHT,
+    menuWidth: UI_CONSTANTS.MENU_WIDTH,
+    spacing: UI_CONSTANTS.SPACING
   });
   
   // Inspector state hook
@@ -85,8 +99,9 @@ export function ElementInspector({
     setUserPrompt,
     toggleInspection,
     handlePromptSubmit,
-  } = useInspector({
-    initialIsActive,
+  } =  useInspector({
+    // Use shouldEnableInspect from iframe messaging if in iframe, otherwise use initialIsActive
+    initialIsActive: isInIframe ? shouldEnableInspect : initialIsActive,
     onPromptGenerated: (prompt, elements) => {
       // Send prompt to parent frame if in iframe
       if (isInIframe) {
@@ -108,6 +123,13 @@ export function ElementInspector({
     handlePromptSubmit(e, selectedElements);
   }, [handlePromptSubmit, selectedElements]);
   
+  // Update inspection state when shouldEnableInspect changes (from iframe messages)
+  useEffect(() => {
+    if (isInIframe && isInspecting !== shouldEnableInspect) {
+      toggleInspection();
+    }
+  }, [isInIframe, isInspecting, shouldEnableInspect, toggleInspection]);
+  
   // Element selector props
   const elementSelectorProps = {
     onElementHovered: handleElementHovered,
@@ -116,6 +138,7 @@ export function ElementInspector({
     ignoreList: selectedElements,
     excludeSelector,
     style: selectorStyle,
+    elementFilter: isInIframe ? elementFilter : undefined, // Only apply filter when in iframe
   };
 
   return (
@@ -164,14 +187,14 @@ export function ElementInspector({
         {/* Expanded Menu - Only Prompt Form */}
         {isInspecting && selectedElements.length > 0 && (
           <>
-            {/* Position indicator arrow */}
+            {/* Position indicator arrow - positioned on the left */}
             <div
               style={{
                 ...elements.menuArrow,
                 top: isMenuAboveElement 
-                  ? `${bubblePosition.top + 75}px` // Arrow at bottom of menu
+                  ? `${bubblePosition.top + UI_CONSTANTS.MENU_HEIGHT}px` // Arrow at bottom of menu
                   : `${bubblePosition.top - 8}px`,  // Arrow at top of menu
-                left: `${bubblePosition.left + bubblePosition.arrowOffset}px`,
+                left: `${bubblePosition.left + UI_CONSTANTS.ARROW_LEFT_OFFSET}px`, // Fixed left position with small offset from menu edge
                 borderTop: isMenuAboveElement ? `8px solid ${isDarkMode ? '#1f2937' : 'white'}` : 'none',
                 borderBottom: isMenuAboveElement ? 'none' : `8px solid ${isDarkMode ? '#1f2937' : 'white'}`,
                 pointerEvents: 'none',
@@ -188,7 +211,7 @@ export function ElementInspector({
                 position: 'fixed',
                 top: `${bubblePosition.top}px`,
                 left: `${bubblePosition.left}px`,
-                zIndex: 10000,
+                zIndex: UI_CONSTANTS.Z_INDEX,
                 maxHeight: '400px',
                 overflowY: 'auto',
               }}
@@ -205,18 +228,20 @@ export function ElementInspector({
           </>
         )}
 
-        {/* Main Menu Button Container - Always at bottom right */}
-        <div style={{ 
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          zIndex: 10000,
-        }}>
-          <BubbleMenuButton 
-            isInspecting={isInspecting} 
-            onClick={handleMenuToggle} 
-          />
-        </div>
+        {/* Main Menu Button Container - Only shown when showBubbleMenuButton is true */}
+        {showBubbleMenuButton && (
+          <div style={{ 
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            zIndex: UI_CONSTANTS.Z_INDEX,
+          }}>
+            <BubbleMenuButton 
+              isInspecting={isInspecting} 
+              onClick={handleMenuToggle} 
+            />
+          </div>
+        )}
       </div>
     </div>
   );

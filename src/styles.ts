@@ -12,7 +12,7 @@ export const layout = {
     borderRadius: '8px',
     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
     padding: '16px',
-    width: '300px',
+    width: '350px',
     transition: 'all 0.15s ease-in-out',
     zIndex: 9999,
     position: 'relative',
@@ -128,12 +128,13 @@ export const text = {
 export const inputs = {
   promptInput: {
     flexGrow: 1,
-    minHeight: "30px",
+    minHeight: "65px",
     fontSize: '14px',
     outline: 'none',
     fontFamily: 'inherit',
     borderColor: 'transparent',
     padding: 0,
+    width: '100%',
   },
   promptInputFocus: {
     borderColor: '#3b82f6',

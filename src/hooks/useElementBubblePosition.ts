@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { UI_CONSTANTS } from '../constants';
 
 interface BubblePosition {
   top: number;
@@ -19,11 +20,15 @@ interface UseElementBubblePositionProps {
  */
 export function useElementBubblePosition({
   selectedElements,
-  menuHeight = 75,
-  menuWidth = 300,
-  spacing = 10,
+  menuHeight = UI_CONSTANTS.MENU_HEIGHT,
+  menuWidth = UI_CONSTANTS.MENU_WIDTH,
+  spacing = UI_CONSTANTS.SPACING,
 }: UseElementBubblePositionProps) {
-  const [bubblePosition, setBubblePosition] = useState<BubblePosition>({ top: 0, left: 0, arrowOffset: 20 });
+  const [bubblePosition, setBubblePosition] = useState<BubblePosition>({ 
+    top: 0, 
+    left: 0, 
+    arrowOffset: UI_CONSTANTS.ARROW_LEFT_OFFSET 
+  });
   const [isMenuAboveElement, setIsMenuAboveElement] = useState(false);
   
   // Calculate and update bubble position based on selected elements
@@ -50,8 +55,9 @@ export function useElementBubblePosition({
         ? rect.top + window.scrollY - menuHeight - spacing // spacing above the element
         : rect.bottom + window.scrollY + spacing; // spacing below the element
         
-      // Initialize left position - try to center the menu on the element if possible
-      let left = rect.left + (rect.width / 2) - (menuWidth / 2) + window.scrollX;
+      // Initialize left position - align with the element's left edge
+      // (changed from centering to better work with left-aligned arrow)
+      let left = rect.left + window.scrollX;
       
       // Special case for elements very close to the bottom of the page
       if (isNearBottom && rect.top < menuHeight + spacing * 2) {
