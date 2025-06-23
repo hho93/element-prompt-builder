@@ -1,7 +1,11 @@
 "use client";
 import React from "react";
 import { IconTick, IconAi } from "../Icons";
-import { buttons, darkMode, inputs } from "../styles";
+import { 
+  formContainerStyles, 
+  getPromptTextareaStyles,
+  submitButtonStyles
+} from "../styles/form-styles";
 
 interface PromptFormProps {
   /**
@@ -40,57 +44,29 @@ export function PromptForm({
   selectedElementsCount,
   isDarkMode,
 }: PromptFormProps) {
+  const textareaStyles = getPromptTextareaStyles(isDarkMode, selectedElementsCount);
+  
   return (
     <form onSubmit={handlePromptSubmit}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          gap: "8px",
-          alignItems: "flex-start",
-          width: "100%",
-        }}
-      >
-        <div style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          position: 'relative',
-          gap: '5px',
-          width: '100%' 
-        }}>
+      <div style={formContainerStyles.wrapper}>
+        <div style={formContainerStyles.inputWrapper}>
           <div className="mt-1"><IconAi /></div>
           <textarea
             value={userPrompt}
             onChange={(e) => setUserPrompt(e.target.value)}
-            style={{
-              ...inputs.promptInput,
-              ...(isDarkMode ? darkMode.promptInput : {}),
-              ...(selectedElementsCount > 0 ? inputs.promptInputSelected : {}),
-              resize: "none",
-              minHeight: "62px", // Height for approximately 3 lines
-              lineHeight: "1.5",
-            }}
+            style={textareaStyles.textarea}
             placeholder={"Tell me how to modify this element...\nI can help change its style, content, or behavior."}
           />
         </div>
         {userPrompt.trim() !== "" && (
           <button
             type="submit"
-            style={{
-              ...buttons.submitButton,
-              borderRadius: "50%",
-              padding: "5px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            style={submitButtonStyles.button}
             onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor =
-                buttons.submitButtonHover.backgroundColor;
+              e.currentTarget.style.backgroundColor = submitButtonStyles.hoverBackgroundColor;
             }}
             onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor =
-                buttons.submitButton.backgroundColor;
+              e.currentTarget.style.backgroundColor = submitButtonStyles.normalBackgroundColor;
             }}
           >
             <IconTick />

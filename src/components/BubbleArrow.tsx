@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { elements } from '../styles';
+import { getBubbleArrowStyles } from '../styles/bubble-arrow-styles';
 
 interface BubbleArrowProps {
   /**
@@ -39,19 +39,11 @@ export function BubbleArrow({
   isDarkMode,
   visible
 }: BubbleArrowProps) {
+  const styles = getBubbleArrowStyles(top, left, isAboveElement, isDarkMode, visible);
+  
   return (
     <div
-      style={{
-        ...elements.menuArrow,
-        top: isAboveElement 
-          ? `${top + 75}px` // If menu is above element, arrow is at bottom of menu
-          : `${top - 8}px`,  // If menu is below element, arrow is at top of menu
-        left: `${left}px`,
-        borderTop: isAboveElement ? `8px solid ${isDarkMode ? '#1f2937' : 'white'}` : 'none',
-        borderBottom: isAboveElement ? 'none' : `8px solid ${isDarkMode ? '#1f2937' : 'white'}`,
-        pointerEvents: 'none', // Ensure arrow doesn't interfere with mouse events
-        opacity: visible ? 1 : 0,
-      }}
+      style={styles.arrow}
       aria-hidden="true" // Accessibility - this is decorative
     />
   );

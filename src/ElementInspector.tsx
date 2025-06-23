@@ -1,10 +1,6 @@
 "use client";
 import React, { useCallback, useEffect } from 'react';
-import { BubbleMenuButton, ElementTagLabel, PromptForm } from './components/';
-import { ElementHighlighter } from './ElementHighlighter';
-import { ElementSelector } from './ElementSelector';
-import { darkMode, elements, layout } from './styles';
-import { UI_CONSTANTS } from './constants';
+import { BubbleMenu, InspectionOverlay } from './components';
 import {
   useDarkMode,
   useElementBubblePosition,
@@ -12,6 +8,7 @@ import {
   useIframeMessaging,
   useInspector
 } from './hooks';
+import { UI_CONSTANTS } from './constants';
 
 export interface ElementInspectorProps {
   /**
@@ -129,124 +126,37 @@ export function ElementInspector({
       toggleInspection();
     }
   }, [isInIframe, isInspecting, shouldEnableInspect, toggleInspection]);
-  
-  // Element selector props
-  const elementSelectorProps = {
-    onElementHovered: handleElementHovered,
-    onElementSelected: handleElementSelected,
-    onElementUnhovered: handleElementUnhovered,
-    ignoreList: selectedElements,
-    excludeSelector,
-    style: selectorStyle,
-    elementFilter: isInIframe ? elementFilter : undefined, // Only apply filter when in iframe
-  };
 
   return (
     <div>
-      {/* Element Inspector Component */}
-      {isInspecting && (
-        <>
-          {/* Element selection overlay */}
-          <ElementSelector {...elementSelectorProps} />
-          
-          {/* Highlight for hovered element */}
-          {hoveredElement && (
-            <ElementHighlighter 
-              element={hoveredElement}
-              borderColor="rgba(59, 130, 246, 0.8)"
-              backgroundColor="rgba(59, 130, 246, 0.2)"
-              style={highlighterStyle}
-            >
-              {elementLabel ? elementLabel(hoveredElement) : <ElementTagLabel element={hoveredElement} />}
-            </ElementHighlighter>
-          )}
-          
-          {/* Highlights for selected elements */}
-          {selectedElements.map((element, index) => {
-            // Add data attribute to mark as selected for tracking
-            element.setAttribute('data-element-inspector-selected', 'true');
-            return (
-              <ElementHighlighter
-                key={`selected-${index}`}
-                element={element}
-                borderColor="rgba(34, 197, 94, 0.8)"
-                backgroundColor="rgba(34, 197, 94, 0.2)"
-                style={highlighterStyle}
-              >
-                {elementLabel ? elementLabel(element) : <ElementTagLabel element={element} />}
-              </ElementHighlighter>
-            );
-          })}
-        </>
-      )}
+      {/* Element Inspector Components */}
+      <InspectionOverlay
+        isInspecting={isInspecting}
+        hoveredElement={hoveredElement}
+        selectedElements={selectedElements}
+        onElementHovered={handleElementHovered}
+        onElementSelected={handleElementSelected}
+        onElementUnhovered={handleElementUnhovered}
+        excludeSelector={excludeSelector}
+        selectorStyle={selectorStyle}
+        highlighterStyle={highlighterStyle}
+        elementLabel={elementLabel}
+        elementFilter={isInIframe ? elementFilter : undefined}
+      />
 
       {/* Bubble Menu */}
-      <div 
-        className="element-inspector-bubble"
-        style={{
-          ...layout.bubble,
-          position: 'static', // The container doesn't need positioning
-        }}
-      >
-        {/* Expanded Menu - Only Prompt Form */}
-        {isInspecting && selectedElements.length > 0 && (
-          <>
-            {/* Position indicator arrow - positioned on the left */}
-            <div
-              style={{
-                ...elements.menuArrow,
-                top: isMenuAboveElement 
-                  ? `${bubblePosition.top + UI_CONSTANTS.MENU_HEIGHT}px` // Arrow at bottom of menu
-                  : `${bubblePosition.top - 8}px`,  // Arrow at top of menu
-                left: `${bubblePosition.left + UI_CONSTANTS.ARROW_LEFT_OFFSET}px`, // Fixed left position with small offset from menu edge
-                borderTop: isMenuAboveElement ? `8px solid ${isDarkMode ? '#1f2937' : 'white'}` : 'none',
-                borderBottom: isMenuAboveElement ? 'none' : `8px solid ${isDarkMode ? '#1f2937' : 'white'}`,
-                pointerEvents: 'none',
-                opacity: selectedElements.length > 0 ? 1 : 0,
-              }}
-              aria-hidden="true"
-            />
-            <div 
-              className="element-inspector-controls"
-              style={{
-                ...layout.expandedMenu,
-                ...(isDarkMode ? darkMode.expandedMenu : {}),
-                padding: '16px',
-                position: 'fixed',
-                top: `${bubblePosition.top}px`,
-                left: `${bubblePosition.left}px`,
-                zIndex: UI_CONSTANTS.Z_INDEX,
-                maxHeight: '400px',
-                overflowY: 'auto',
-              }}
-            >
-              {/* Prompt Input */}
-              <PromptForm
-                userPrompt={userPrompt}
-                setUserPrompt={setUserPrompt}
-                handlePromptSubmit={onSubmitPrompt}
-                selectedElementsCount={selectedElements.length}
-                isDarkMode={isDarkMode}
-              />
-            </div>
-          </>
-        )}
-
-        {/* Main Menu Button Container - Only shown when showBubbleMenuButton is true */}
-        {showBubbleMenuButton && (
-          <div style={{ 
-            position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            zIndex: UI_CONSTANTS.Z_INDEX,
-          }}>
-            <BubbleMenuButton 
-              isInspecting={isInspecting} 
-              onClick={handleMenuToggle} 
-            />
-          </div>
-        )}
-      </div>
+      <BubbleMenu
+        isInspecting={isInspecting}
+        selectedElements={selectedElements}
+        bubblePosition={bubblePosition}
+        isMenuAboveElement={isMenuAboveElement}
+        userPrompt={userPrompt}
+        setUserPrompt={setUserPrompt}
+        onSubmitPrompt={onSubmitPrompt}
+        onToggleInspection={handleMenuToggle}
+        isDarkMode={isDarkMode}
+        showBubbleMenuButton={showBubbleMenuButton}
+      />
     </div>
   );
 }

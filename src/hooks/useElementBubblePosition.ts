@@ -78,9 +78,11 @@ export function useElementBubblePosition({
       
       // Calculate arrow position relative to the menu - should point to element center
       const arrowOffset = elementCenterX - left - window.scrollX;
+
+      const scrolledPixels = window.scrollY || window.pageYOffset;
       
       // Ensure the bubble stays within viewport bounds vertically
-      top = Math.max(spacing, top);
+      top = Math.max(spacing, top) - scrolledPixels;
       
       setBubblePosition({ 
         top, 

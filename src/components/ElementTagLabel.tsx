@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { elements } from "../styles";
+import { elements } from "../styles/base-styles";
 
 interface ElementTagLabelProps {
   /**

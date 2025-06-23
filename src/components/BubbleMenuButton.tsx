@@ -1,14 +1,14 @@
 "use client";
 import React from "react";
 import { IconSquareDashedPointer } from "../Icons";
-import { buttons } from "../styles";
+import { getBubbleMenuButtonStyles } from "../styles/bubble-button-styles";
 
 interface BubbleMenuButtonProps {
   /**
    * Whether the inspector is currently active
    */
   isInspecting: boolean;
-  
+
   /**
    * Click handler for the button
    */
@@ -22,23 +22,24 @@ export function BubbleMenuButton({
   isInspecting,
   onClick,
 }: BubbleMenuButtonProps) {
+  const title = isInspecting
+    ? "Disable Element Inspector"
+    : "Enable Element Inspector";
+  const styles = getBubbleMenuButtonStyles(isInspecting);
+  const handleMouseOver = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.backgroundColor = styles.hoverBackgroundColor;
+  };
+  const handleMouseOut = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.backgroundColor = styles.normalBackgroundColor;
+  };
+
   return (
     <button
       onClick={onClick}
-      style={{
-        ...buttons.mainButton,
-        backgroundColor: isInspecting ? '#2563eb' : '#93c5fd', // Lighter blue when not enabled
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
-      }}
-      onMouseOver={(e) => {
-        e.currentTarget.style.backgroundColor =
-          isInspecting ? '#1d4ed8' : '#60a5fa'; // Darker on hover but still lighter than active
-      }}
-      onMouseOut={(e) => {
-        e.currentTarget.style.backgroundColor =
-          isInspecting ? '#2563eb' : '#93c5fd';
-      }}
-      title={isInspecting ? "Disable Element Inspector" : "Enable Element Inspector"}
+      style={styles.button}
+      onMouseOver={handleMouseOver}
+      onMouseOut={handleMouseOut}
+      title={title}
     >
       <IconSquareDashedPointer />
     </button>

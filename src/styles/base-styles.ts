@@ -1,4 +1,5 @@
-// Styles for the ElementInspector component
+"use client";
+// Base styles for the ElementInspector component
 
 // Layout styles
 export const layout = {

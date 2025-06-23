@@ -1,6 +1,7 @@
 "use client";
 import React, { useCallback, useRef } from 'react';
 import { getMostSpecificElementAtPoint } from './utils';
+import { elementSelectorStyles } from './styles/selector-styles';
 
 export interface ElementSelectorProps {
   /**
@@ -153,13 +154,7 @@ export function ElementSelector({
       className={`element-selector ${className}`}
       data-element-selector="true"
       style={{
-        position: 'fixed',
-        inset: 0,
-        height: '100vh',
-        width: '100vw',
-        cursor: 'cell',
-        zIndex: 9999,
-        pointerEvents: 'auto',
+        ...elementSelectorStyles.overlay,
         ...style,
       }}
       onMouseMove={handleMouseMove}

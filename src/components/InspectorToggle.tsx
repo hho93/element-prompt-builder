@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { IconPointer } from "../Icons";
-import { buttons, darkMode, layout, states, text } from "../styles";
+import { buttons, darkMode, layout, states, text } from "../styles/base-styles";
 
 interface InspectorToggleProps {
   /**

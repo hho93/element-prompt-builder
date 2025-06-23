@@ -1,5 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useRef } from 'react';
+import { getHighlighterStyles } from './styles/highlighter-styles';
 
 export interface ElementHighlighterProps {
   /**
@@ -98,19 +99,7 @@ export function ElementHighlighter({
   return (
     <div
       className={`element-highlighter ${className}`}
-      style={{
-        position: 'fixed',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: '4px',
-        border: `2px solid ${borderColor}`,
-        backgroundColor,
-        transition: 'all 100ms',
-        zIndex: 9998,
-        pointerEvents: 'none',
-        ...style,
-      }}
+      style={getHighlighterStyles(borderColor, backgroundColor, style).container}
       ref={boxRef}
     >
       {children}

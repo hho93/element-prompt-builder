@@ -257,6 +257,19 @@ function getElementDepth(element) {
   return depth;
 }
 
+// src/styles/selector-styles.ts
+var elementSelectorStyles = {
+  overlay: {
+    position: "fixed",
+    inset: 0,
+    height: "100vh",
+    width: "100vw",
+    cursor: "cell",
+    zIndex: 9999,
+    pointerEvents: "auto"
+  }
+};
+
 // src/ElementSelector.tsx
 var import_jsx_runtime = require("react/jsx-runtime");
 function ElementSelector({
@@ -329,13 +342,7 @@ function ElementSelector({
       className: `element-selector ${className}`,
       "data-element-selector": "true",
       style: {
-        position: "fixed",
-        inset: 0,
-        height: "100vh",
-        width: "100vw",
-        cursor: "cell",
-        zIndex: 9999,
-        pointerEvents: "auto",
+        ...elementSelectorStyles.overlay,
         ...style
       },
       onMouseMove: handleMouseMove,
@@ -349,6 +356,27 @@ function ElementSelector({
 
 // src/ElementHighlighter.tsx
 var import_react2 = require("react");
+
+// src/styles/highlighter-styles.ts
+var getHighlighterStyles = (borderColor = "rgba(59, 130, 246, 0.8)", backgroundColor = "rgba(59, 130, 246, 0.2)", customStyles = {}) => {
+  return {
+    container: {
+      position: "fixed",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: "4px",
+      border: `2px solid ${borderColor}`,
+      backgroundColor,
+      transition: "all 100ms",
+      zIndex: 9998,
+      pointerEvents: "none",
+      ...customStyles
+    }
+  };
+};
+
+// src/ElementHighlighter.tsx
 var import_jsx_runtime2 = require("react/jsx-runtime");
 function ElementHighlighter({
   element,
@@ -397,19 +425,7 @@ function ElementHighlighter({
     "div",
     {
       className: `element-highlighter ${className}`,
-      style: {
-        position: "fixed",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: "4px",
-        border: `2px solid ${borderColor}`,
-        backgroundColor,
-        transition: "all 100ms",
-        zIndex: 9998,
-        pointerEvents: "none",
-        ...style
-      },
+      style: getHighlighterStyles(borderColor, backgroundColor, style).container,
       ref: boxRef,
       children
     }
@@ -419,7 +435,101 @@ function ElementHighlighter({
 // src/ElementInspector.tsx
 var import_react8 = require("react");
 
-// src/styles.ts
+// src/constants.ts
+var UI_CONSTANTS = {
+  // Menu dimensions
+  MENU_WIDTH: 350,
+  // Width of the control menu in pixels
+  MENU_HEIGHT: 94,
+  // Height of the control menu in pixels
+  // Spacing and offsets
+  SPACING: 10,
+  // Standard spacing for margins and padding
+  ARROW_LEFT_OFFSET: 20,
+  // Left offset for the arrow from menu edge
+  // Z-index values
+  Z_INDEX: 1e4
+  // Standard z-index for UI elements
+};
+
+// src/styles/bubble-menu-styles.ts
+var getMenuArrowStyles = (isMenuAboveElement, bubblePosition, isDarkMode, isVisible) => {
+  const topPosition = isMenuAboveElement ? `${bubblePosition.top + UI_CONSTANTS.MENU_HEIGHT}px` : `${bubblePosition.top - 8}px`;
+  const leftPosition = `${bubblePosition.left + UI_CONSTANTS.ARROW_LEFT_OFFSET}px`;
+  const borderTop = isMenuAboveElement ? `8px solid ${isDarkMode ? "#1f2937" : "white"}` : "none";
+  const borderBottom = isMenuAboveElement ? "none" : `8px solid ${isDarkMode ? "#1f2937" : "white"}`;
+  return {
+    menuArrow: {
+      position: "fixed",
+      width: 0,
+      height: 0,
+      borderLeft: "8px solid transparent",
+      borderRight: "8px solid transparent",
+      top: topPosition,
+      left: leftPosition,
+      borderTop,
+      borderBottom,
+      pointerEvents: "none",
+      opacity: isVisible ? 1 : 0,
+      zIndex: UI_CONSTANTS.Z_INDEX + 1
+    }
+  };
+};
+var floatingButtonStyles = {
+  container: {
+    position: "fixed",
+    bottom: "24px",
+    right: "24px",
+    zIndex: UI_CONSTANTS.Z_INDEX
+  }
+};
+
+// src/components/bubble-menu/MenuArrow.tsx
+var import_jsx_runtime3 = require("react/jsx-runtime");
+var MenuArrow = ({
+  isMenuAboveElement,
+  bubblePosition,
+  isDarkMode,
+  isVisible
+}) => {
+  const styles = getMenuArrowStyles(
+    isMenuAboveElement,
+    bubblePosition,
+    isDarkMode,
+    isVisible
+  );
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+    "div",
+    {
+      className: "element-inspector-menu-arrow",
+      style: styles.menuArrow,
+      "aria-hidden": "true"
+    }
+  );
+};
+
+// src/Icons.tsx
+var import_jsx_runtime4 = require("react/jsx-runtime");
+var IconSquareDashedPointer = () => /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "lucide lucide-square-dashed-mouse-pointer-icon lucide-square-dashed-mouse-pointer", children: [
+  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M12.034 12.681a.498.498 0 0 1 .647-.647l9 3.5a.5.5 0 0 1-.033.943l-3.444 1.068a1 1 0 0 0-.66.66l-1.067 3.443a.5.5 0 0 1-.943.033z" }),
+  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M5 3a2 2 0 0 0-2 2" }),
+  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M19 3a2 2 0 0 1 2 2" }),
+  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M5 21a2 2 0 0 1-2-2" }),
+  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M9 3h1" }),
+  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M9 21h2" }),
+  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M14 3h1" }),
+  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M3 9v1" }),
+  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M21 9v2" }),
+  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M3 14v1" })
+] });
+var IconTick = () => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("polyline", { points: "20 6 9 17 4 12" }) });
+var IconAi = () => /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { width: "23", height: "23", viewBox: "0 0 23 23", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: [
+  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M9.55507 5.34461L10.1322 6.94742C10.7733 8.72633 12.1742 10.1272 13.9531 10.7683L15.5559 11.3455C15.7004 11.3979 15.7004 11.6028 15.5559 11.6545L13.9531 12.2317C12.1742 12.8728 10.7733 14.2736 10.1322 16.0525L9.55507 17.6554C9.5026 17.7998 9.29776 17.7998 9.24601 17.6554L8.66885 16.0525C8.02772 14.2736 6.62688 12.8728 4.84797 12.2317L3.24516 11.6545C3.10069 11.602 3.10069 11.3972 3.24516 11.3455L4.84797 10.7683C6.62688 10.1272 8.02772 8.72633 8.66885 6.94742L9.24601 5.34461C9.29776 5.19942 9.5026 5.19942 9.55507 5.34461Z", fill: "black" }),
+  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M16.7699 1.49284L17.0624 2.30431C17.3873 3.2049 18.0967 3.91431 18.9973 4.23918L19.8088 4.53172C19.8821 4.55831 19.8821 4.66181 19.8088 4.6884L18.9973 4.98093C18.0967 5.30581 17.3873 6.01521 17.0624 6.91581L16.7699 7.72728C16.7433 7.80059 16.6398 7.80059 16.6132 7.72728L16.3207 6.91581C15.9958 6.01521 15.2864 5.30581 14.3858 4.98093L13.5743 4.6884C13.501 4.66181 13.501 4.55831 13.5743 4.53172L14.3858 4.23918C15.2864 3.91431 15.9958 3.2049 16.3207 2.30431L16.6132 1.49284C16.6398 1.41881 16.744 1.41881 16.7699 1.49284Z", fill: "black" }),
+  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M16.7699 15.2734L17.0624 16.0849C17.3873 16.9855 18.0967 17.6949 18.9973 18.0198L19.8088 18.3123C19.8821 18.3389 19.8821 18.4424 19.8088 18.469L18.9973 18.7615C18.0967 19.0864 17.3873 19.7958 17.0624 20.6964L16.7699 21.5079C16.7433 21.5812 16.6398 21.5812 16.6132 21.5079L16.3207 20.6964C15.9958 19.7958 15.2864 19.0864 14.3858 18.7615L13.5743 18.469C13.501 18.4424 13.501 18.3389 13.5743 18.3123L14.3858 18.0198C15.2864 17.6949 15.9958 16.9855 16.3207 16.0849L16.6132 15.2734C16.6398 15.2001 16.744 15.2001 16.7699 15.2734Z", fill: "black" })
+] });
+
+// src/styles/base-styles.ts
 var layout = {
   bubble: {
     position: "fixed",
@@ -590,63 +700,51 @@ var darkMode = {
   }
 };
 
-// src/Icons.tsx
-var import_jsx_runtime3 = require("react/jsx-runtime");
-var IconSquareDashedPointer = () => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "lucide lucide-square-dashed-mouse-pointer-icon lucide-square-dashed-mouse-pointer", children: [
-  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M12.034 12.681a.498.498 0 0 1 .647-.647l9 3.5a.5.5 0 0 1-.033.943l-3.444 1.068a1 1 0 0 0-.66.66l-1.067 3.443a.5.5 0 0 1-.943.033z" }),
-  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M5 3a2 2 0 0 0-2 2" }),
-  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M19 3a2 2 0 0 1 2 2" }),
-  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M5 21a2 2 0 0 1-2-2" }),
-  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M9 3h1" }),
-  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M9 21h2" }),
-  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M14 3h1" }),
-  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M3 9v1" }),
-  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M21 9v2" }),
-  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M3 14v1" })
-] });
-var IconTick = () => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("polyline", { points: "20 6 9 17 4 12" }) });
-var IconAi = () => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("svg", { width: "23", height: "23", viewBox: "0 0 23 23", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: [
-  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M9.55507 5.34461L10.1322 6.94742C10.7733 8.72633 12.1742 10.1272 13.9531 10.7683L15.5559 11.3455C15.7004 11.3979 15.7004 11.6028 15.5559 11.6545L13.9531 12.2317C12.1742 12.8728 10.7733 14.2736 10.1322 16.0525L9.55507 17.6554C9.5026 17.7998 9.29776 17.7998 9.24601 17.6554L8.66885 16.0525C8.02772 14.2736 6.62688 12.8728 4.84797 12.2317L3.24516 11.6545C3.10069 11.602 3.10069 11.3972 3.24516 11.3455L4.84797 10.7683C6.62688 10.1272 8.02772 8.72633 8.66885 6.94742L9.24601 5.34461C9.29776 5.19942 9.5026 5.19942 9.55507 5.34461Z", fill: "black" }),
-  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M16.7699 1.49284L17.0624 2.30431C17.3873 3.2049 18.0967 3.91431 18.9973 4.23918L19.8088 4.53172C19.8821 4.55831 19.8821 4.66181 19.8088 4.6884L18.9973 4.98093C18.0967 5.30581 17.3873 6.01521 17.0624 6.91581L16.7699 7.72728C16.7433 7.80059 16.6398 7.80059 16.6132 7.72728L16.3207 6.91581C15.9958 6.01521 15.2864 5.30581 14.3858 4.98093L13.5743 4.6884C13.501 4.66181 13.501 4.55831 13.5743 4.53172L14.3858 4.23918C15.2864 3.91431 15.9958 3.2049 16.3207 2.30431L16.6132 1.49284C16.6398 1.41881 16.744 1.41881 16.7699 1.49284Z", fill: "black" }),
-  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M16.7699 15.2734L17.0624 16.0849C17.3873 16.9855 18.0967 17.6949 18.9973 18.0198L19.8088 18.3123C19.8821 18.3389 19.8821 18.4424 19.8088 18.469L18.9973 18.7615C18.0967 19.0864 17.3873 19.7958 17.0624 20.6964L16.7699 21.5079C16.7433 21.5812 16.6398 21.5812 16.6132 21.5079L16.3207 20.6964C15.9958 19.7958 15.2864 19.0864 14.3858 18.7615L13.5743 18.469C13.501 18.4424 13.501 18.3389 13.5743 18.3123L14.3858 18.0198C15.2864 17.6949 15.9958 16.9855 16.3207 16.0849L16.6132 15.2734C16.6398 15.2001 16.744 15.2001 16.7699 15.2734Z", fill: "black" })
-] });
-
-// src/components/BubbleMenuButton.tsx
-var import_jsx_runtime4 = require("react/jsx-runtime");
-function BubbleMenuButton({
-  isInspecting,
-  onClick
-}) {
-  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-    "button",
-    {
-      onClick,
-      style: {
-        ...buttons.mainButton,
-        backgroundColor: isInspecting ? "#2563eb" : "#93c5fd",
-        // Lighter blue when not enabled
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.15)"
-      },
-      onMouseOver: (e) => {
-        e.currentTarget.style.backgroundColor = isInspecting ? "#1d4ed8" : "#60a5fa";
-      },
-      onMouseOut: (e) => {
-        e.currentTarget.style.backgroundColor = isInspecting ? "#2563eb" : "#93c5fd";
-      },
-      title: isInspecting ? "Disable Element Inspector" : "Enable Element Inspector",
-      children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(IconSquareDashedPointer, {})
+// src/styles/form-styles.ts
+var formContainerStyles = {
+  wrapper: {
+    display: "flex",
+    flexDirection: "row",
+    gap: "8px",
+    alignItems: "flex-start",
+    width: "100%"
+  },
+  inputWrapper: {
+    display: "flex",
+    alignItems: "flex-start",
+    position: "relative",
+    gap: "5px",
+    width: "100%"
+  }
+};
+var getPromptTextareaStyles = (isDarkMode, selectedElementsCount) => {
+  return {
+    textarea: {
+      ...inputs.promptInput,
+      ...isDarkMode ? darkMode.promptInput : {},
+      ...selectedElementsCount > 0 ? inputs.promptInputSelected : {},
+      resize: "none",
+      minHeight: "62px",
+      // Height for approximately 3 lines
+      lineHeight: "1.5"
     }
-  );
-}
-
-// src/components/ElementTagLabel.tsx
-var import_jsx_runtime5 = require("react/jsx-runtime");
-function ElementTagLabel({ element }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: elements.elementTagLabel, children: element.tagName.toLowerCase() });
-}
+  };
+};
+var submitButtonStyles = {
+  button: {
+    ...buttons.submitButton,
+    borderRadius: "50%",
+    padding: "5px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  hoverBackgroundColor: buttons.submitButtonHover.backgroundColor,
+  normalBackgroundColor: buttons.submitButton.backgroundColor
+};
 
 // src/components/PromptForm.tsx
-var import_jsx_runtime6 = require("react/jsx-runtime");
+var import_jsx_runtime5 = require("react/jsx-runtime");
 function PromptForm({
   userPrompt,
   setUserPrompt,
@@ -654,84 +752,295 @@ function PromptForm({
   selectedElementsCount,
   isDarkMode
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("form", { onSubmit: handlePromptSubmit, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
-    "div",
-    {
-      style: {
-        display: "flex",
-        flexDirection: "row",
-        gap: "8px",
-        alignItems: "flex-start",
-        width: "100%"
-      },
-      children: [
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: {
-          display: "flex",
-          alignItems: "flex-start",
-          position: "relative",
-          gap: "5px",
-          width: "100%"
-        }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "mt-1", children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(IconAi, {}) }),
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-            "textarea",
-            {
-              value: userPrompt,
-              onChange: (e) => setUserPrompt(e.target.value),
-              style: {
-                ...inputs.promptInput,
-                ...isDarkMode ? darkMode.promptInput : {},
-                ...selectedElementsCount > 0 ? inputs.promptInputSelected : {},
-                resize: "none",
-                minHeight: "62px",
-                // Height for approximately 3 lines
-                lineHeight: "1.5"
-              },
-              placeholder: "Tell me how to modify this element...\nI can help change its style, content, or behavior."
-            }
-          )
-        ] }),
-        userPrompt.trim() !== "" && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-          "button",
-          {
-            type: "submit",
-            style: {
-              ...buttons.submitButton,
-              borderRadius: "50%",
-              padding: "5px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            },
-            onMouseOver: (e) => {
-              e.currentTarget.style.backgroundColor = buttons.submitButtonHover.backgroundColor;
-            },
-            onMouseOut: (e) => {
-              e.currentTarget.style.backgroundColor = buttons.submitButton.backgroundColor;
-            },
-            children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(IconTick, {})
-          }
-        )
-      ]
-    }
-  ) });
+  const textareaStyles = getPromptTextareaStyles(isDarkMode, selectedElementsCount);
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("form", { onSubmit: handlePromptSubmit, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: formContainerStyles.wrapper, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: formContainerStyles.inputWrapper, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "mt-1", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(IconAi, {}) }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+        "textarea",
+        {
+          value: userPrompt,
+          onChange: (e) => setUserPrompt(e.target.value),
+          style: textareaStyles.textarea,
+          placeholder: "Tell me how to modify this element...\nI can help change its style, content, or behavior."
+        }
+      )
+    ] }),
+    userPrompt.trim() !== "" && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+      "button",
+      {
+        type: "submit",
+        style: submitButtonStyles.button,
+        onMouseOver: (e) => {
+          e.currentTarget.style.backgroundColor = submitButtonStyles.hoverBackgroundColor;
+        },
+        onMouseOut: (e) => {
+          e.currentTarget.style.backgroundColor = submitButtonStyles.normalBackgroundColor;
+        },
+        children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(IconTick, {})
+      }
+    )
+  ] }) });
 }
 
-// src/constants.ts
-var UI_CONSTANTS = {
-  // Menu dimensions
-  MENU_WIDTH: 350,
-  // Width of the control menu in pixels
-  MENU_HEIGHT: 94,
-  // Height of the control menu in pixels
-  // Spacing and offsets
-  SPACING: 10,
-  // Standard spacing for margins and padding
-  ARROW_LEFT_OFFSET: 20,
-  // Left offset for the arrow from menu edge
-  // Z-index values
-  Z_INDEX: 1e4
-  // Standard z-index for UI elements
+// src/styles/expanded-menu-styles.ts
+var getExpandedMenuStyles = (top, left, isDarkMode) => {
+  return {
+    container: {
+      ...layout.expandedMenu,
+      ...isDarkMode ? darkMode.expandedMenu : {},
+      padding: "16px",
+      position: "fixed",
+      // Use fixed to stay consistent with scroll position
+      top: `${top}px`,
+      left: `${left}px`,
+      zIndex: 1e4,
+      maxHeight: "400px",
+      // Ensure it doesn't get too large
+      overflowY: "auto"
+      // Add scrolling if needed
+    }
+  };
+};
+
+// src/components/bubble-menu/ExpandedMenu.tsx
+var import_jsx_runtime6 = require("react/jsx-runtime");
+var ExpandedMenu = ({
+  bubblePosition,
+  userPrompt,
+  setUserPrompt,
+  onSubmitPrompt,
+  selectedElementsCount,
+  isDarkMode
+}) => {
+  const styles = getExpandedMenuStyles(bubblePosition.top, bubblePosition.left, isDarkMode);
+  return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "element-inspector-controls", style: styles.container, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+    PromptForm,
+    {
+      userPrompt,
+      setUserPrompt,
+      handlePromptSubmit: onSubmitPrompt,
+      selectedElementsCount,
+      isDarkMode
+    }
+  ) });
+};
+
+// src/styles/bubble-button-styles.ts
+var getBubbleMenuButtonStyles = (isInspecting) => {
+  return {
+    button: {
+      ...buttons.mainButton,
+      backgroundColor: isInspecting ? "#2563eb" : "#93c5fd",
+      // Lighter blue when not enabled
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.15)"
+    },
+    hoverBackgroundColor: isInspecting ? "#1d4ed8" : "#60a5fa",
+    // Darker on hover but still lighter than active
+    normalBackgroundColor: isInspecting ? "#2563eb" : "#93c5fd"
+  };
+};
+
+// src/components/BubbleMenuButton.tsx
+var import_jsx_runtime7 = require("react/jsx-runtime");
+function BubbleMenuButton({
+  isInspecting,
+  onClick
+}) {
+  const title = isInspecting ? "Disable Element Inspector" : "Enable Element Inspector";
+  const styles = getBubbleMenuButtonStyles(isInspecting);
+  const handleMouseOver = (e) => {
+    e.currentTarget.style.backgroundColor = styles.hoverBackgroundColor;
+  };
+  const handleMouseOut = (e) => {
+    e.currentTarget.style.backgroundColor = styles.normalBackgroundColor;
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+    "button",
+    {
+      onClick,
+      style: styles.button,
+      onMouseOver: handleMouseOver,
+      onMouseOut: handleMouseOut,
+      title,
+      children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(IconSquareDashedPointer, {})
+    }
+  );
+}
+
+// src/components/bubble-menu/FloatingButton.tsx
+var import_jsx_runtime8 = require("react/jsx-runtime");
+var FloatingButton = ({
+  isInspecting,
+  onToggle
+}) => {
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    "div",
+    {
+      className: "element-inspector-floating-button-container",
+      style: floatingButtonStyles.container,
+      children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(BubbleMenuButton, { isInspecting, onClick: onToggle })
+    }
+  );
+};
+
+// src/components/bubble-menu/BubbleMenu.tsx
+var import_jsx_runtime9 = require("react/jsx-runtime");
+var BubbleMenu = ({
+  isInspecting,
+  selectedElements,
+  bubblePosition,
+  isMenuAboveElement,
+  userPrompt,
+  setUserPrompt,
+  onSubmitPrompt,
+  onToggleInspection,
+  isDarkMode,
+  showBubbleMenuButton
+}) => {
+  const showMenu = isInspecting && selectedElements.length > 0;
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "element-inspector-bubble", children: [
+    showMenu && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_jsx_runtime9.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+        MenuArrow,
+        {
+          isMenuAboveElement,
+          bubblePosition,
+          isDarkMode,
+          isVisible: selectedElements.length > 0
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+        ExpandedMenu,
+        {
+          bubblePosition,
+          userPrompt,
+          setUserPrompt,
+          onSubmitPrompt,
+          selectedElementsCount: selectedElements.length,
+          isDarkMode
+        }
+      )
+    ] }),
+    showBubbleMenuButton && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+      FloatingButton,
+      {
+        isInspecting,
+        onToggle: onToggleInspection
+      }
+    )
+  ] });
+};
+
+// src/components/ElementTagLabel.tsx
+var import_jsx_runtime10 = require("react/jsx-runtime");
+function ElementTagLabel({ element }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("div", { style: elements.elementTagLabel, children: element.tagName.toLowerCase() });
+}
+
+// src/styles/highlights-styles.ts
+var hoveredElementStyles = {
+  highlighter: {
+    borderColor: "rgba(59, 130, 246, 0.8)",
+    backgroundColor: "rgba(59, 130, 246, 0.2)"
+  }
+};
+var selectedElementStyles = {
+  highlighter: {
+    borderColor: "rgba(34, 197, 94, 0.8)",
+    backgroundColor: "rgba(34, 197, 94, 0.2)"
+  }
+};
+
+// src/components/highlights/HoveredElement.tsx
+var import_jsx_runtime11 = require("react/jsx-runtime");
+var HoveredElement = ({
+  hoveredElement,
+  elementLabel,
+  highlighterStyle
+}) => {
+  if (!hoveredElement) return null;
+  return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+    ElementHighlighter,
+    {
+      element: hoveredElement,
+      borderColor: hoveredElementStyles.highlighter.borderColor,
+      backgroundColor: hoveredElementStyles.highlighter.backgroundColor,
+      style: highlighterStyle,
+      children: elementLabel ? elementLabel(hoveredElement) : /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(ElementTagLabel, { element: hoveredElement })
+    }
+  );
+};
+
+// src/components/highlights/SelectedElements.tsx
+var import_jsx_runtime12 = require("react/jsx-runtime");
+var SelectedElements = ({
+  selectedElements,
+  elementLabel,
+  highlighterStyle
+}) => {
+  return /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(import_jsx_runtime12.Fragment, { children: selectedElements.map((element, index) => {
+    element.setAttribute("data-element-inspector-selected", "true");
+    return /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+      ElementHighlighter,
+      {
+        element,
+        borderColor: selectedElementStyles.highlighter.borderColor,
+        backgroundColor: selectedElementStyles.highlighter.backgroundColor,
+        style: highlighterStyle,
+        children: elementLabel ? elementLabel(element) : /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(ElementTagLabel, { element })
+      },
+      `selected-${index}`
+    );
+  }) });
+};
+
+// src/components/InspectionOverlay.tsx
+var import_jsx_runtime13 = require("react/jsx-runtime");
+var InspectionOverlay = ({
+  isInspecting,
+  hoveredElement,
+  selectedElements,
+  onElementHovered,
+  onElementSelected,
+  onElementUnhovered,
+  excludeSelector,
+  selectorStyle,
+  highlighterStyle,
+  elementLabel,
+  elementFilter
+}) => {
+  if (!isInspecting) return null;
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_jsx_runtime13.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+      ElementSelector,
+      {
+        onElementHovered,
+        onElementSelected,
+        onElementUnhovered,
+        ignoreList: selectedElements,
+        excludeSelector,
+        style: selectorStyle,
+        elementFilter
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+      HoveredElement,
+      {
+        hoveredElement,
+        elementLabel,
+        highlighterStyle
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+      SelectedElements,
+      {
+        selectedElements,
+        elementLabel,
+        highlighterStyle
+      }
+    )
+  ] });
 };
 
 // src/hooks/useDarkMode.ts
@@ -786,7 +1095,8 @@ function useElementBubblePosition({
       }
       left = Math.max(spacing, Math.min(left, viewportWidth - menuWidth - spacing));
       const arrowOffset = elementCenterX - left - window.scrollX;
-      top = Math.max(spacing, top);
+      const scrolledPixels = window.scrollY || window.pageYOffset;
+      top = Math.max(spacing, top) - scrolledPixels;
       setBubblePosition({
         top,
         left,
@@ -1021,7 +1331,7 @@ function useInspector({
 }
 
 // src/ElementInspector.tsx
-var import_jsx_runtime7 = require("react/jsx-runtime");
+var import_jsx_runtime14 = require("react/jsx-runtime");
 function ElementInspector({
   initialIsActive = true,
   excludeSelector = ".element-inspector-bubble, .element-inspector-controls",
@@ -1087,113 +1397,36 @@ function ElementInspector({
       toggleInspection();
     }
   }, [isInIframe, isInspecting, shouldEnableInspect, toggleInspection]);
-  const elementSelectorProps = {
-    onElementHovered: handleElementHovered,
-    onElementSelected: handleElementSelected,
-    onElementUnhovered: handleElementUnhovered,
-    ignoreList: selectedElements,
-    excludeSelector,
-    style: selectorStyle,
-    elementFilter: isInIframe ? elementFilter : void 0
-    // Only apply filter when in iframe
-  };
-  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { children: [
-    isInspecting && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ElementSelector, { ...elementSelectorProps }),
-      hoveredElement && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-        ElementHighlighter,
-        {
-          element: hoveredElement,
-          borderColor: "rgba(59, 130, 246, 0.8)",
-          backgroundColor: "rgba(59, 130, 246, 0.2)",
-          style: highlighterStyle,
-          children: elementLabel ? elementLabel(hoveredElement) : /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ElementTagLabel, { element: hoveredElement })
-        }
-      ),
-      selectedElements.map((element, index) => {
-        element.setAttribute("data-element-inspector-selected", "true");
-        return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-          ElementHighlighter,
-          {
-            element,
-            borderColor: "rgba(34, 197, 94, 0.8)",
-            backgroundColor: "rgba(34, 197, 94, 0.2)",
-            style: highlighterStyle,
-            children: elementLabel ? elementLabel(element) : /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ElementTagLabel, { element })
-          },
-          `selected-${index}`
-        );
-      })
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(
-      "div",
+  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      InspectionOverlay,
       {
-        className: "element-inspector-bubble",
-        style: {
-          ...layout.bubble,
-          position: "static"
-          // The container doesn't need positioning
-        },
-        children: [
-          isInspecting && selectedElements.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-              "div",
-              {
-                style: {
-                  ...elements.menuArrow,
-                  top: isMenuAboveElement ? `${bubblePosition.top + UI_CONSTANTS.MENU_HEIGHT}px` : `${bubblePosition.top - 8}px`,
-                  // Arrow at top of menu
-                  left: `${bubblePosition.left + UI_CONSTANTS.ARROW_LEFT_OFFSET}px`,
-                  // Fixed left position with small offset from menu edge
-                  borderTop: isMenuAboveElement ? `8px solid ${isDarkMode ? "#1f2937" : "white"}` : "none",
-                  borderBottom: isMenuAboveElement ? "none" : `8px solid ${isDarkMode ? "#1f2937" : "white"}`,
-                  pointerEvents: "none",
-                  opacity: selectedElements.length > 0 ? 1 : 0
-                },
-                "aria-hidden": "true"
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-              "div",
-              {
-                className: "element-inspector-controls",
-                style: {
-                  ...layout.expandedMenu,
-                  ...isDarkMode ? darkMode.expandedMenu : {},
-                  padding: "16px",
-                  position: "fixed",
-                  top: `${bubblePosition.top}px`,
-                  left: `${bubblePosition.left}px`,
-                  zIndex: UI_CONSTANTS.Z_INDEX,
-                  maxHeight: "400px",
-                  overflowY: "auto"
-                },
-                children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-                  PromptForm,
-                  {
-                    userPrompt,
-                    setUserPrompt,
-                    handlePromptSubmit: onSubmitPrompt,
-                    selectedElementsCount: selectedElements.length,
-                    isDarkMode
-                  }
-                )
-              }
-            )
-          ] }),
-          showBubbleMenuButton && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { style: {
-            position: "fixed",
-            bottom: "24px",
-            right: "24px",
-            zIndex: UI_CONSTANTS.Z_INDEX
-          }, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-            BubbleMenuButton,
-            {
-              isInspecting,
-              onClick: handleMenuToggle
-            }
-          ) })
-        ]
+        isInspecting,
+        hoveredElement,
+        selectedElements,
+        onElementHovered: handleElementHovered,
+        onElementSelected: handleElementSelected,
+        onElementUnhovered: handleElementUnhovered,
+        excludeSelector,
+        selectorStyle,
+        highlighterStyle,
+        elementLabel,
+        elementFilter: isInIframe ? elementFilter : void 0
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      BubbleMenu,
+      {
+        isInspecting,
+        selectedElements,
+        bubblePosition,
+        isMenuAboveElement,
+        userPrompt,
+        setUserPrompt,
+        onSubmitPrompt,
+        onToggleInspection: handleMenuToggle,
+        isDarkMode,
+        showBubbleMenuButton
       }
     )
   ] });
