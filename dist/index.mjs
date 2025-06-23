@@ -382,7 +382,7 @@ function ElementHighlighter({
 }
 
 // src/ElementInspector.tsx
-import { useCallback as useCallback6, useEffect as useEffect6 } from "react";
+import { useCallback as useCallback6, useEffect as useEffect7 } from "react";
 
 // src/styles.ts
 var layout = {
@@ -771,7 +771,7 @@ function useElementBubblePosition({
 }
 
 // src/hooks/useElementSelection.ts
-import { useState as useState3, useCallback as useCallback3 } from "react";
+import { useState as useState3, useCallback as useCallback3, useEffect as useEffect4 } from "react";
 function useElementSelection({ onElementsSelected } = {}) {
   const [hoveredElement, setHoveredElement] = useState3(null);
   const [selectedElements, setSelectedElements] = useState3([]);
@@ -784,19 +784,43 @@ function useElementSelection({ onElementsSelected } = {}) {
   const handleElementSelected = useCallback3((element) => {
     const isElementSelected = selectedElements.includes(element);
     if (isElementSelected) {
+      element.removeAttribute("data-element-inspector-selected");
       const newSelectedElements = selectedElements.filter((el) => el !== element);
       setSelectedElements(newSelectedElements);
       onElementsSelected == null ? void 0 : onElementsSelected(newSelectedElements);
     } else {
+      selectedElements.forEach((el) => {
+        el.removeAttribute("data-element-inspector-selected");
+      });
+      element.setAttribute("data-element-inspector-selected", "true");
       const newSelectedElements = [element];
       setSelectedElements(newSelectedElements);
       onElementsSelected == null ? void 0 : onElementsSelected(newSelectedElements);
     }
   }, [selectedElements, onElementsSelected]);
   const clearSelections = useCallback3(() => {
+    selectedElements.forEach((element) => {
+      element.removeAttribute("data-element-inspector-selected");
+    });
     setSelectedElements([]);
     onElementsSelected == null ? void 0 : onElementsSelected([]);
-  }, [onElementsSelected]);
+  }, [selectedElements, onElementsSelected]);
+  useEffect4(() => {
+    const handleClearSelections = () => {
+      clearSelections();
+    };
+    document.addEventListener("clearElementSelections", handleClearSelections);
+    return () => {
+      document.removeEventListener("clearElementSelections", handleClearSelections);
+    };
+  }, [clearSelections]);
+  useEffect4(() => {
+    return () => {
+      selectedElements.forEach((element) => {
+        element.removeAttribute("data-element-inspector-selected");
+      });
+    };
+  }, [selectedElements]);
   return {
     hoveredElement,
     selectedElements,
@@ -808,24 +832,33 @@ function useElementSelection({ onElementsSelected } = {}) {
 }
 
 // src/hooks/useIframeMessaging.ts
-import { useCallback as useCallback4, useEffect as useEffect4, useState as useState4 } from "react";
+import { useCallback as useCallback4, useEffect as useEffect5, useState as useState4 } from "react";
 function useIframeMessaging() {
   const isInIframe = typeof window !== "undefined" && window.self !== window.top;
   const [activeTab, setActiveTab] = useState4(null);
   const [shouldEnableInspect, setShouldEnableInspect] = useState4(!isInIframe);
   const [onlySelectButtons, setOnlySelectButtons] = useState4(false);
-  useEffect4(() => {
+  useEffect5(() => {
     if (!isInIframe) return;
     const handleMessage = (event) => {
       var _a;
       if (((_a = event.data) == null ? void 0 : _a.type) === "TAB_CHANGED") {
         const { activeTab: newActiveTab } = event.data.payload || {};
+        const previousTab = activeTab;
         setActiveTab(newActiveTab);
         if (newActiveTab === "chat") {
           setShouldEnableInspect(false);
         } else if (newActiveTab === "design" || newActiveTab === "workflow") {
           setShouldEnableInspect(true);
-          setOnlySelectButtons(newActiveTab === "workflow");
+          const isWorkflowTab = newActiveTab === "workflow";
+          setOnlySelectButtons(isWorkflowTab);
+          if (isWorkflowTab && previousTab !== "workflow" && document.querySelectorAll('[data-element-inspector-selected="true"]').length > 0) {
+            const selectedElements = Array.from(document.querySelectorAll('[data-element-inspector-selected="true"]'));
+            const hasNonButtonSelected = selectedElements.some((element) => !isButtonElement(element));
+            if (hasNonButtonSelected) {
+              document.dispatchEvent(new CustomEvent("clearElementSelections"));
+            }
+          }
         }
       }
     };
@@ -833,21 +866,24 @@ function useIframeMessaging() {
     return () => {
       window.removeEventListener("message", handleMessage);
     };
-  }, [isInIframe]);
+  }, [isInIframe, activeTab]);
+  const isButtonElement = useCallback4((element) => {
+    const isButtonElement2 = element.tagName.toLowerCase() === "button";
+    const hasButtonRole = element.getAttribute("role") === "button";
+    const hasButtonType = element.getAttribute("type") === "button" || element.getAttribute("type") === "submit" || element.getAttribute("type") === "reset";
+    const classNames = element.className.toLowerCase();
+    const hasButtonClass = classNames.includes("btn") || classNames.includes("button") || classNames.includes("-btn-") || classNames.includes("submit") || classNames.includes("action");
+    const computedStyle = window.getComputedStyle(element);
+    const hasCursorPointer = computedStyle.cursor === "pointer";
+    const hasOnClickAttr = element.hasAttribute("onclick") || element.hasAttribute("ng-click") || element.hasAttribute("@click");
+    return isButtonElement2 || hasButtonRole || hasButtonType || hasButtonClass || hasCursorPointer && hasOnClickAttr;
+  }, []);
   const elementFilter = useCallback4((element) => {
     if (onlySelectButtons) {
-      const isButtonElement = element.tagName.toLowerCase() === "button";
-      const hasButtonRole = element.getAttribute("role") === "button";
-      const hasButtonType = element.getAttribute("type") === "button" || element.getAttribute("type") === "submit" || element.getAttribute("type") === "reset";
-      const classNames = element.className.toLowerCase();
-      const hasButtonClass = classNames.includes("btn") || classNames.includes("button") || classNames.includes("-btn-") || classNames.includes("submit") || classNames.includes("action");
-      const computedStyle = window.getComputedStyle(element);
-      const hasCursorPointer = computedStyle.cursor === "pointer";
-      const hasOnClickAttr = element.hasAttribute("onclick") || element.hasAttribute("ng-click") || element.hasAttribute("@click");
-      return isButtonElement || hasButtonRole || hasButtonType || hasButtonClass || hasCursorPointer && hasOnClickAttr;
+      return isButtonElement(element);
     }
     return true;
-  }, [onlySelectButtons]);
+  }, [onlySelectButtons, isButtonElement]);
   const sendSelectedElements = useCallback4((elements2) => {
     if (!isInIframe) return;
     window.parent.postMessage({
@@ -904,7 +940,7 @@ function useIframeMessaging() {
 }
 
 // src/hooks/useInspector.ts
-import { useState as useState5, useCallback as useCallback5, useEffect as useEffect5 } from "react";
+import { useState as useState5, useCallback as useCallback5, useEffect as useEffect6 } from "react";
 function useInspector({
   initialIsActive = true,
   onPromptGenerated
@@ -914,7 +950,7 @@ function useInspector({
   const toggleInspection = useCallback5(() => {
     setIsInspecting((prev) => !prev);
   }, []);
-  useEffect5(() => {
+  useEffect6(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape" && isInspecting) {
         setIsInspecting(false);
@@ -1011,7 +1047,7 @@ function ElementInspector({
   const onSubmitPrompt = useCallback6((e) => {
     handlePromptSubmit(e, selectedElements);
   }, [handlePromptSubmit, selectedElements]);
-  useEffect6(() => {
+  useEffect7(() => {
     if (isInIframe && isInspecting !== shouldEnableInspect) {
       toggleInspection();
     }
@@ -1039,17 +1075,20 @@ function ElementInspector({
           children: elementLabel ? elementLabel(hoveredElement) : /* @__PURE__ */ jsx7(ElementTagLabel, { element: hoveredElement })
         }
       ),
-      selectedElements.map((element, index) => /* @__PURE__ */ jsx7(
-        ElementHighlighter,
-        {
-          element,
-          borderColor: "rgba(34, 197, 94, 0.8)",
-          backgroundColor: "rgba(34, 197, 94, 0.2)",
-          style: highlighterStyle,
-          children: elementLabel ? elementLabel(element) : /* @__PURE__ */ jsx7(ElementTagLabel, { element })
-        },
-        `selected-${index}`
-      ))
+      selectedElements.map((element, index) => {
+        element.setAttribute("data-element-inspector-selected", "true");
+        return /* @__PURE__ */ jsx7(
+          ElementHighlighter,
+          {
+            element,
+            borderColor: "rgba(34, 197, 94, 0.8)",
+            backgroundColor: "rgba(34, 197, 94, 0.2)",
+            style: highlighterStyle,
+            children: elementLabel ? elementLabel(element) : /* @__PURE__ */ jsx7(ElementTagLabel, { element })
+          },
+          `selected-${index}`
+        );
+      })
     ] }),
     /* @__PURE__ */ jsxs3(
       "div",

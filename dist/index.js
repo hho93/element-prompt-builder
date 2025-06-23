@@ -819,19 +819,43 @@ function useElementSelection({ onElementsSelected } = {}) {
   const handleElementSelected = (0, import_react5.useCallback)((element) => {
     const isElementSelected = selectedElements.includes(element);
     if (isElementSelected) {
+      element.removeAttribute("data-element-inspector-selected");
       const newSelectedElements = selectedElements.filter((el) => el !== element);
       setSelectedElements(newSelectedElements);
       onElementsSelected == null ? void 0 : onElementsSelected(newSelectedElements);
     } else {
+      selectedElements.forEach((el) => {
+        el.removeAttribute("data-element-inspector-selected");
+      });
+      element.setAttribute("data-element-inspector-selected", "true");
       const newSelectedElements = [element];
       setSelectedElements(newSelectedElements);
       onElementsSelected == null ? void 0 : onElementsSelected(newSelectedElements);
     }
   }, [selectedElements, onElementsSelected]);
   const clearSelections = (0, import_react5.useCallback)(() => {
+    selectedElements.forEach((element) => {
+      element.removeAttribute("data-element-inspector-selected");
+    });
     setSelectedElements([]);
     onElementsSelected == null ? void 0 : onElementsSelected([]);
-  }, [onElementsSelected]);
+  }, [selectedElements, onElementsSelected]);
+  (0, import_react5.useEffect)(() => {
+    const handleClearSelections = () => {
+      clearSelections();
+    };
+    document.addEventListener("clearElementSelections", handleClearSelections);
+    return () => {
+      document.removeEventListener("clearElementSelections", handleClearSelections);
+    };
+  }, [clearSelections]);
+  (0, import_react5.useEffect)(() => {
+    return () => {
+      selectedElements.forEach((element) => {
+        element.removeAttribute("data-element-inspector-selected");
+      });
+    };
+  }, [selectedElements]);
   return {
     hoveredElement,
     selectedElements,
@@ -855,12 +879,21 @@ function useIframeMessaging() {
       var _a;
       if (((_a = event.data) == null ? void 0 : _a.type) === "TAB_CHANGED") {
         const { activeTab: newActiveTab } = event.data.payload || {};
+        const previousTab = activeTab;
         setActiveTab(newActiveTab);
         if (newActiveTab === "chat") {
           setShouldEnableInspect(false);
         } else if (newActiveTab === "design" || newActiveTab === "workflow") {
           setShouldEnableInspect(true);
-          setOnlySelectButtons(newActiveTab === "workflow");
+          const isWorkflowTab = newActiveTab === "workflow";
+          setOnlySelectButtons(isWorkflowTab);
+          if (isWorkflowTab && previousTab !== "workflow" && document.querySelectorAll('[data-element-inspector-selected="true"]').length > 0) {
+            const selectedElements = Array.from(document.querySelectorAll('[data-element-inspector-selected="true"]'));
+            const hasNonButtonSelected = selectedElements.some((element) => !isButtonElement(element));
+            if (hasNonButtonSelected) {
+              document.dispatchEvent(new CustomEvent("clearElementSelections"));
+            }
+          }
         }
       }
     };
@@ -868,21 +901,24 @@ function useIframeMessaging() {
     return () => {
       window.removeEventListener("message", handleMessage);
     };
-  }, [isInIframe]);
+  }, [isInIframe, activeTab]);
+  const isButtonElement = (0, import_react6.useCallback)((element) => {
+    const isButtonElement2 = element.tagName.toLowerCase() === "button";
+    const hasButtonRole = element.getAttribute("role") === "button";
+    const hasButtonType = element.getAttribute("type") === "button" || element.getAttribute("type") === "submit" || element.getAttribute("type") === "reset";
+    const classNames = element.className.toLowerCase();
+    const hasButtonClass = classNames.includes("btn") || classNames.includes("button") || classNames.includes("-btn-") || classNames.includes("submit") || classNames.includes("action");
+    const computedStyle = window.getComputedStyle(element);
+    const hasCursorPointer = computedStyle.cursor === "pointer";
+    const hasOnClickAttr = element.hasAttribute("onclick") || element.hasAttribute("ng-click") || element.hasAttribute("@click");
+    return isButtonElement2 || hasButtonRole || hasButtonType || hasButtonClass || hasCursorPointer && hasOnClickAttr;
+  }, []);
   const elementFilter = (0, import_react6.useCallback)((element) => {
     if (onlySelectButtons) {
-      const isButtonElement = element.tagName.toLowerCase() === "button";
-      const hasButtonRole = element.getAttribute("role") === "button";
-      const hasButtonType = element.getAttribute("type") === "button" || element.getAttribute("type") === "submit" || element.getAttribute("type") === "reset";
-      const classNames = element.className.toLowerCase();
-      const hasButtonClass = classNames.includes("btn") || classNames.includes("button") || classNames.includes("-btn-") || classNames.includes("submit") || classNames.includes("action");
-      const computedStyle = window.getComputedStyle(element);
-      const hasCursorPointer = computedStyle.cursor === "pointer";
-      const hasOnClickAttr = element.hasAttribute("onclick") || element.hasAttribute("ng-click") || element.hasAttribute("@click");
-      return isButtonElement || hasButtonRole || hasButtonType || hasButtonClass || hasCursorPointer && hasOnClickAttr;
+      return isButtonElement(element);
     }
     return true;
-  }, [onlySelectButtons]);
+  }, [onlySelectButtons, isButtonElement]);
   const sendSelectedElements = (0, import_react6.useCallback)((elements2) => {
     if (!isInIframe) return;
     window.parent.postMessage({
@@ -1074,17 +1110,20 @@ function ElementInspector({
           children: elementLabel ? elementLabel(hoveredElement) : /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ElementTagLabel, { element: hoveredElement })
         }
       ),
-      selectedElements.map((element, index) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-        ElementHighlighter,
-        {
-          element,
-          borderColor: "rgba(34, 197, 94, 0.8)",
-          backgroundColor: "rgba(34, 197, 94, 0.2)",
-          style: highlighterStyle,
-          children: elementLabel ? elementLabel(element) : /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ElementTagLabel, { element })
-        },
-        `selected-${index}`
-      ))
+      selectedElements.map((element, index) => {
+        element.setAttribute("data-element-inspector-selected", "true");
+        return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+          ElementHighlighter,
+          {
+            element,
+            borderColor: "rgba(34, 197, 94, 0.8)",
+            backgroundColor: "rgba(34, 197, 94, 0.2)",
+            style: highlighterStyle,
+            children: elementLabel ? elementLabel(element) : /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ElementTagLabel, { element })
+          },
+          `selected-${index}`
+        );
+      })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(
       "div",

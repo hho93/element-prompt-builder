@@ -162,17 +162,21 @@ export function ElementInspector({
           )}
           
           {/* Highlights for selected elements */}
-          {selectedElements.map((element, index) => (
-            <ElementHighlighter
-              key={`selected-${index}`}
-              element={element}
-              borderColor="rgba(34, 197, 94, 0.8)"
-              backgroundColor="rgba(34, 197, 94, 0.2)"
-              style={highlighterStyle}
-            >
-              {elementLabel ? elementLabel(element) : <ElementTagLabel element={element} />}
-            </ElementHighlighter>
-          ))}
+          {selectedElements.map((element, index) => {
+            // Add data attribute to mark as selected for tracking
+            element.setAttribute('data-element-inspector-selected', 'true');
+            return (
+              <ElementHighlighter
+                key={`selected-${index}`}
+                element={element}
+                borderColor="rgba(34, 197, 94, 0.8)"
+                backgroundColor="rgba(34, 197, 94, 0.2)"
+                style={highlighterStyle}
+              >
+                {elementLabel ? elementLabel(element) : <ElementTagLabel element={element} />}
+              </ElementHighlighter>
+            );
+          })}
         </>
       )}
 
