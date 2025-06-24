@@ -61,7 +61,6 @@ export function ElementInspector({
     sendSelectedElements, 
     sendPrompt,
     shouldEnableInspect,
-    elementFilter
   } = useIframeMessaging();
   
   // Element selection hook
@@ -141,7 +140,6 @@ export function ElementInspector({
         selectorStyle={selectorStyle}
         highlighterStyle={highlighterStyle}
         elementLabel={elementLabel}
-        elementFilter={isInIframe ? elementFilter : undefined}
       />
 
       {/* Bubble Menu */}

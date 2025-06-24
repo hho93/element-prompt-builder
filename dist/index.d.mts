@@ -30,16 +30,11 @@ interface ElementSelectorProps {
      * Custom styles for the selector overlay
      */
     style?: React.CSSProperties;
-    /**
-     * Custom filter function for elements
-     * Return true to allow selection, false to prevent
-     */
-    elementFilter?: (element: HTMLElement) => boolean;
 }
 /**
  * ElementSelector component that creates an overlay to select DOM elements
  */
-declare function ElementSelector({ onElementHovered, onElementUnhovered, onElementSelected, ignoreList, excludeSelector, className, style, elementFilter, }: ElementSelectorProps): react_jsx_runtime.JSX.Element;
+declare function ElementSelector({ onElementHovered, onElementUnhovered, onElementSelected, ignoreList, excludeSelector, className, style, }: ElementSelectorProps): react_jsx_runtime.JSX.Element;
 
 interface ElementHighlighterProps {
     /**

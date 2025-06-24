@@ -244,8 +244,7 @@ function ElementSelector({
   ignoreList = [],
   excludeSelector = "",
   className = "",
-  style = {},
-  elementFilter
+  style = {}
 }) {
   const lastHoveredElement = useRef(null);
   const handleMouseMove = useCallback(
@@ -263,15 +262,12 @@ function ElementSelector({
       if (refElement === overlayElement || overlayElement && overlayElement.contains(refElement)) {
         return;
       }
-      if (elementFilter && !elementFilter(refElement)) {
-        return;
-      }
       if (lastHoveredElement.current !== refElement) {
         lastHoveredElement.current = refElement;
         onElementHovered(refElement);
       }
     },
-    [onElementHovered, ignoreList, excludeSelector, elementFilter]
+    [onElementHovered, ignoreList, excludeSelector]
   );
   const handleMouseLeave = useCallback(() => {
     lastHoveredElement.current = null;
@@ -293,13 +289,10 @@ function ElementSelector({
       if (clickedElement === overlayElement || overlayElement && overlayElement.contains(clickedElement)) {
         return;
       }
-      if (elementFilter && !elementFilter(clickedElement)) {
-        return;
-      }
       lastHoveredElement.current = clickedElement;
       onElementSelected(clickedElement);
     },
-    [onElementSelected, ignoreList, excludeSelector, elementFilter]
+    [onElementSelected, ignoreList, excludeSelector]
   );
   return /* @__PURE__ */ jsx(
     "div",
@@ -972,8 +965,7 @@ var InspectionOverlay = ({
   excludeSelector,
   selectorStyle,
   highlighterStyle,
-  elementLabel,
-  elementFilter
+  elementLabel
 }) => {
   if (!isInspecting) return null;
   return /* @__PURE__ */ jsxs4(Fragment3, { children: [
@@ -985,8 +977,7 @@ var InspectionOverlay = ({
         onElementUnhovered,
         ignoreList: selectedElements,
         excludeSelector,
-        style: selectorStyle,
-        elementFilter
+        style: selectorStyle
       }
     ),
     /* @__PURE__ */ jsx13(
@@ -1147,28 +1138,17 @@ function useIframeMessaging() {
   const isInIframe = typeof window !== "undefined" && window.self !== window.top;
   const [activeTab, setActiveTab] = useState4(null);
   const [shouldEnableInspect, setShouldEnableInspect] = useState4(!isInIframe);
-  const [onlySelectButtons, setOnlySelectButtons] = useState4(false);
   useEffect5(() => {
     if (!isInIframe) return;
     const handleMessage = (event) => {
       var _a;
       if (((_a = event.data) == null ? void 0 : _a.type) === "TAB_CHANGED") {
         const { activeTab: newActiveTab } = event.data.payload || {};
-        const previousTab = activeTab;
         setActiveTab(newActiveTab);
         if (newActiveTab === "chat") {
           setShouldEnableInspect(false);
         } else if (newActiveTab === "design" || newActiveTab === "workflow") {
           setShouldEnableInspect(true);
-          const isWorkflowTab = newActiveTab === "workflow";
-          setOnlySelectButtons(isWorkflowTab);
-          if (isWorkflowTab && previousTab !== "workflow" && document.querySelectorAll('[data-element-inspector-selected="true"]').length > 0) {
-            const selectedElements = Array.from(document.querySelectorAll('[data-element-inspector-selected="true"]'));
-            const hasNonButtonSelected = selectedElements.some((element) => !isButtonElement(element));
-            if (hasNonButtonSelected) {
-              document.dispatchEvent(new CustomEvent("clearElementSelections"));
-            }
-          }
         }
       }
     };
@@ -1177,23 +1157,6 @@ function useIframeMessaging() {
       window.removeEventListener("message", handleMessage);
     };
   }, [isInIframe, activeTab]);
-  const isButtonElement = useCallback4((element) => {
-    const isButtonElement2 = element.tagName.toLowerCase() === "button";
-    const hasButtonRole = element.getAttribute("role") === "button";
-    const hasButtonType = element.getAttribute("type") === "button" || element.getAttribute("type") === "submit" || element.getAttribute("type") === "reset";
-    const classNames = element.className.toLowerCase();
-    const hasButtonClass = classNames.includes("btn") || classNames.includes("button") || classNames.includes("-btn-") || classNames.includes("submit") || classNames.includes("action");
-    const computedStyle = window.getComputedStyle(element);
-    const hasCursorPointer = computedStyle.cursor === "pointer";
-    const hasOnClickAttr = element.hasAttribute("onclick") || element.hasAttribute("ng-click") || element.hasAttribute("@click");
-    return isButtonElement2 || hasButtonRole || hasButtonType || hasButtonClass || hasCursorPointer && hasOnClickAttr;
-  }, []);
-  const elementFilter = useCallback4((element) => {
-    if (onlySelectButtons) {
-      return isButtonElement(element);
-    }
-    return true;
-  }, [onlySelectButtons, isButtonElement]);
   const sendSelectedElements = useCallback4((elements2) => {
     if (!isInIframe) return;
     window.parent.postMessage({
@@ -1243,9 +1206,7 @@ function useIframeMessaging() {
     sendSelectedElements,
     sendPrompt,
     activeTab,
-    shouldEnableInspect,
-    elementFilter,
-    onlySelectButtons
+    shouldEnableInspect
   };
 }
 
@@ -1310,8 +1271,7 @@ function ElementInspector({
     isInIframe,
     sendSelectedElements,
     sendPrompt,
-    shouldEnableInspect,
-    elementFilter
+    shouldEnableInspect
   } = useIframeMessaging();
   const {
     hoveredElement,
@@ -1375,8 +1335,7 @@ function ElementInspector({
         excludeSelector,
         selectorStyle,
         highlighterStyle,
-        elementLabel,
-        elementFilter: isInIframe ? elementFilter : void 0
+        elementLabel
       }
     ),
     /* @__PURE__ */ jsx14(

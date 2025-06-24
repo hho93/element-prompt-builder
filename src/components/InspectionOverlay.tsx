@@ -15,7 +15,6 @@ interface InspectionOverlayProps {
   selectorStyle?: React.CSSProperties;
   highlighterStyle?: React.CSSProperties;
   elementLabel?: (element: HTMLElement) => React.ReactNode;
-  elementFilter?: (element: HTMLElement) => boolean;
 }
 
 export const InspectionOverlay: React.FC<InspectionOverlayProps> = ({
@@ -29,7 +28,6 @@ export const InspectionOverlay: React.FC<InspectionOverlayProps> = ({
   selectorStyle,
   highlighterStyle,
   elementLabel,
-  elementFilter,
 }) => {
   if (!isInspecting) return null;
   
@@ -43,7 +41,6 @@ export const InspectionOverlay: React.FC<InspectionOverlayProps> = ({
         ignoreList={selectedElements}
         excludeSelector={excludeSelector}
         style={selectorStyle}
-        elementFilter={elementFilter}
       />
       
       {/* Highlight for hovered element */}
