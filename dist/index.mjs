@@ -720,7 +720,7 @@ function PromptForm({
           value: userPrompt,
           onChange: (e) => setUserPrompt(e.target.value),
           style: textareaStyles.textarea,
-          placeholder: "Tell me how to modify this element...\nI can help change its style, content, or behavior."
+          placeholder: "Tell me how to modify this element...\nI can help change its style, content, or\nbehavior."
         }
       )
     ] }),
