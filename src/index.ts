@@ -4,6 +4,8 @@
  * 
  * @packageDocumentation
  */
+import './styles/global.css';
+
 export { ElementSelector } from './ElementSelector';
 export { ElementHighlighter } from './ElementHighlighter';
 export { ElementInspector } from './ElementInspector';

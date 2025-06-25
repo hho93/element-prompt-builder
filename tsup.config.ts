@@ -7,6 +7,7 @@ export default defineConfig({
   clean: true,
   external: ['react', 'react-dom'],
   sourcemap: true,
+  injectStyle: true,
   esbuildOptions(options) {
     options.jsx = 'automatic';
   },

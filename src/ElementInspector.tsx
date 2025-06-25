@@ -126,6 +126,13 @@ export function ElementInspector({
     }
   }, [isInIframe, isInspecting, shouldEnableInspect, toggleInspection]);
 
+  // Send ready message to parent window when component mounts
+  useEffect(() => {
+    if (isInIframe) {
+      window.parent.postMessage({ type: 'UI_BUILDER_READY' }, '*');
+    }
+  }, [isInIframe]);
+
   return (
     <div>
       {/* Element Inspector Components */}

@@ -1,6 +1,36 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useAuthStore } from "../stores/auth";
 
 type TabType = 'chat' | 'design' | 'workflow' | null;
+
+/**
+ * Extracts common properties from an HTML element
+ */
+const extractElementProperties = (el: HTMLElement) => ({
+  tagName: el.tagName,
+  id: el.id,
+  className: el.className,
+  textContent: el.textContent?.trim(),
+  attributes: Array.from(el.attributes).map(attr => ({
+    name: attr.name,
+    value: attr.value
+  }))
+});
+
+/**
+ * Maps an HTML element to a serializable object representation
+ */
+const mapElementToObject = (el: HTMLElement) => {
+  // Find all form elements inside this element
+  const formElements = Array.from(el.querySelectorAll('input, textarea, select'))
+    .filter(formEl => formEl instanceof HTMLElement)
+    .map((formEl: HTMLElement) => extractElementProperties(formEl));
+    
+  return {
+    ...extractElementProperties(el),
+    childrens: formElements
+  };
+};
 
 /**
  * Custom hook to handle cross-frame communication
@@ -28,6 +58,8 @@ export function useIframeMessaging() {
         else if (newActiveTab === 'design' || newActiveTab === 'workflow') {
           setShouldEnableInspect(true);
         }
+      } else if (event.data?.type === 'ACCESS_TOKEN') {
+        useAuthStore.getState().setAccessToken(event.data.payload.token);
       }
     };
     
@@ -43,16 +75,7 @@ export function useIframeMessaging() {
     window.parent.postMessage({
       type: 'ELEMENT_INSPECTOR_SELECTED',
       payload: {
-        elements: elements.map(el => ({
-          tagName: el.tagName,
-          id: el.id,
-          className: el.className,
-          textContent: el.textContent?.trim(),
-          attributes: Array.from(el.attributes).map(attr => ({
-            name: attr.name,
-            value: attr.value
-          }))
-        }))
+        elements: elements.map(el => mapElementToObject(el))
       }
     }, '*');
   }, [isInIframe]);
@@ -66,16 +89,7 @@ export function useIframeMessaging() {
       payload: {
         prompt,
         activeTab,
-        elements: elements.map(el => ({
-          tagName: el.tagName,
-          id: el.id,
-          className: el.className,
-          textContent: el.textContent?.trim(),
-          attributes: Array.from(el.attributes).map(attr => ({
-            name: attr.name,
-            value: attr.value
-          }))
-        }))
+        elements: elements.map(mapElementToObject)
       }
     }, '*');
   }, [isInIframe, activeTab]);

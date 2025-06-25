@@ -104,9 +104,6 @@ interface ElementInspectorProps {
 declare function ElementInspector({ initialIsActive, excludeSelector, elementLabel, selectorStyle, highlighterStyle, showBubbleMenuButton, }: ElementInspectorProps): react_jsx_runtime.JSX.Element;
 
 /**
- * Utility functions for DOM element inspection and manipulation
- */
-/**
  * Checks if a point is within an element's bounds
  * @param element - The element to check
  * @param clientX - The x coordinate

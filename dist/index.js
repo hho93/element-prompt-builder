@@ -1,7 +1,9 @@
 "use strict";
+var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -15,6 +17,14 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/index.ts
@@ -33,10 +43,40 @@ __export(index_exports, {
 });
 module.exports = __toCommonJS(index_exports);
 
+// #style-inject:#style-inject
+function styleInject(css, { insertAt } = {}) {
+  if (!css || typeof document === "undefined") return;
+  const head = document.head || document.getElementsByTagName("head")[0];
+  const style = document.createElement("style");
+  style.type = "text/css";
+  if (insertAt === "top") {
+    if (head.firstChild) {
+      head.insertBefore(style, head.firstChild);
+    } else {
+      head.appendChild(style);
+    }
+  } else {
+    head.appendChild(style);
+  }
+  if (style.styleSheet) {
+    style.styleSheet.cssText = css;
+  } else {
+    style.appendChild(document.createTextNode(css));
+  }
+}
+
+// src/styles/global.css
+styleInject('/*! tailwindcss v4.1.10 | MIT License | https://tailwindcss.com */\n@layer properties;\n@layer theme, base, components, utilities;\n@layer theme {\n  :root,\n  :host {\n    --color-blue-50: oklch(97% 0.014 254.604);\n    --color-blue-200: oklch(88.2% 0.059 254.128);\n    --color-blue-800: oklch(42.4% 0.199 265.638);\n    --color-blue-950: oklch(28.2% 0.091 267.935);\n    --color-gray-500: oklch(55.1% 0.027 264.364);\n    --color-gray-600: oklch(44.6% 0.03 256.802);\n    --color-black: #000;\n    --color-white: #fff;\n    --spacing: 0.25rem;\n    --text-xs: 0.75rem;\n    --text-xs--line-height: calc(1 / 0.75);\n    --text-sm: 0.875rem;\n    --text-sm--line-height: calc(1.25 / 0.875);\n    --text-base: 1rem;\n    --text-base--line-height: calc(1.5 / 1);\n    --font-weight-semibold: 600;\n    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);\n    --animate-spin: spin 1s linear infinite;\n    --default-transition-duration: 150ms;\n    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);\n    --default-font-family: var(--font-geist-sans);\n    --default-mono-font-family: var(--font-geist-mono);\n  }\n}\n@layer base {\n  *,\n  ::after,\n  ::before,\n  ::backdrop,\n  ::file-selector-button {\n    box-sizing: border-box;\n    margin: 0;\n    padding: 0;\n    border: 0 solid;\n  }\n  html,\n  :host {\n    line-height: 1.5;\n    -webkit-text-size-adjust: 100%;\n    -moz-tab-size: 4;\n    -o-tab-size: 4;\n    tab-size: 4;\n    font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");\n    font-feature-settings: var(--default-font-feature-settings, normal);\n    font-variation-settings: var(--default-font-variation-settings, normal);\n    -webkit-tap-highlight-color: transparent;\n  }\n  hr {\n    height: 0;\n    color: inherit;\n    border-top-width: 1px;\n  }\n  abbr:where([title]) {\n    -webkit-text-decoration: underline dotted;\n    text-decoration: underline dotted;\n  }\n  h1,\n  h2,\n  h3,\n  h4,\n  h5,\n  h6 {\n    font-size: inherit;\n    font-weight: inherit;\n  }\n  a {\n    color: inherit;\n    -webkit-text-decoration: inherit;\n    text-decoration: inherit;\n  }\n  b,\n  strong {\n    font-weight: bolder;\n  }\n  code,\n  kbd,\n  samp,\n  pre {\n    font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);\n    font-feature-settings: var(--default-mono-font-feature-settings, normal);\n    font-variation-settings: var(--default-mono-font-variation-settings, normal);\n    font-size: 1em;\n  }\n  small {\n    font-size: 80%;\n  }\n  sub,\n  sup {\n    font-size: 75%;\n    line-height: 0;\n    position: relative;\n    vertical-align: baseline;\n  }\n  sub {\n    bottom: -0.25em;\n  }\n  sup {\n    top: -0.5em;\n  }\n  table {\n    text-indent: 0;\n    border-color: inherit;\n    border-collapse: collapse;\n  }\n  :-moz-focusring {\n    outline: auto;\n  }\n  progress {\n    vertical-align: baseline;\n  }\n  summary {\n    display: list-item;\n  }\n  ol,\n  ul,\n  menu {\n    list-style: none;\n  }\n  img,\n  svg,\n  video,\n  canvas,\n  audio,\n  iframe,\n  embed,\n  object {\n    display: block;\n    vertical-align: middle;\n  }\n  img,\n  video {\n    max-width: 100%;\n    height: auto;\n  }\n  button,\n  input,\n  select,\n  optgroup,\n  textarea,\n  ::file-selector-button {\n    font: inherit;\n    font-feature-settings: inherit;\n    font-variation-settings: inherit;\n    letter-spacing: inherit;\n    color: inherit;\n    border-radius: 0;\n    background-color: transparent;\n    opacity: 1;\n  }\n  :where(select:is([multiple], [size])) optgroup {\n    font-weight: bolder;\n  }\n  :where(select:is([multiple], [size])) optgroup option {\n    padding-inline-start: 20px;\n  }\n  ::file-selector-button {\n    margin-inline-end: 4px;\n  }\n  ::-moz-placeholder {\n    opacity: 1;\n  }\n  ::placeholder {\n    opacity: 1;\n  }\n  @supports (not (-webkit-appearance: -apple-pay-button)) or (contain-intrinsic-size: 1px) {\n    ::-moz-placeholder {\n      color: currentcolor;\n      @supports (color: color-mix(in lab, red, red)) {\n        color: color-mix(in oklab, currentcolor 50%, transparent);\n      }\n    }\n    ::placeholder {\n      color: currentcolor;\n      @supports (color: color-mix(in lab, red, red)) {\n        color: color-mix(in oklab, currentcolor 50%, transparent);\n      }\n    }\n  }\n  textarea {\n    resize: vertical;\n  }\n  ::-webkit-search-decoration {\n    -webkit-appearance: none;\n  }\n  ::-webkit-date-and-time-value {\n    min-height: 1lh;\n    text-align: inherit;\n  }\n  ::-webkit-datetime-edit {\n    display: inline-flex;\n  }\n  ::-webkit-datetime-edit-fields-wrapper {\n    padding: 0;\n  }\n  ::-webkit-datetime-edit,\n  ::-webkit-datetime-edit-year-field,\n  ::-webkit-datetime-edit-month-field,\n  ::-webkit-datetime-edit-day-field,\n  ::-webkit-datetime-edit-hour-field,\n  ::-webkit-datetime-edit-minute-field,\n  ::-webkit-datetime-edit-second-field,\n  ::-webkit-datetime-edit-millisecond-field,\n  ::-webkit-datetime-edit-meridiem-field {\n    padding-block: 0;\n  }\n  :-moz-ui-invalid {\n    box-shadow: none;\n  }\n  button,\n  input:where([type=button], [type=reset], [type=submit]),\n  ::file-selector-button {\n    -webkit-appearance: button;\n    -moz-appearance: button;\n    appearance: button;\n  }\n  ::-webkit-inner-spin-button,\n  ::-webkit-outer-spin-button {\n    height: auto;\n  }\n  [hidden]:where(:not([hidden=until-found])) {\n    display: none !important;\n  }\n}\n@layer utilities {\n  .visible {\n    visibility: visible;\n  }\n  .sr-only {\n    position: absolute;\n    width: 1px;\n    height: 1px;\n    padding: 0;\n    margin: -1px;\n    overflow: hidden;\n    clip: rect(0, 0, 0, 0);\n    white-space: nowrap;\n    border-width: 0;\n  }\n  .absolute {\n    position: absolute;\n  }\n  .fixed {\n    position: fixed;\n  }\n  .relative {\n    position: relative;\n  }\n  .static {\n    position: static;\n  }\n  .top-1\\/2 {\n    top: calc(1/2 * 100%);\n  }\n  .left-1\\/2 {\n    left: calc(1/2 * 100%);\n  }\n  .z-50 {\n    z-index: 50;\n  }\n  .z-\\[9\\] {\n    z-index: 9;\n  }\n  .z-\\[10001\\] {\n    z-index: 10001;\n  }\n  .container {\n    width: 100%;\n    @media (width >= 40rem) {\n      max-width: 40rem;\n    }\n    @media (width >= 48rem) {\n      max-width: 48rem;\n    }\n    @media (width >= 64rem) {\n      max-width: 64rem;\n    }\n    @media (width >= 80rem) {\n      max-width: 80rem;\n    }\n    @media (width >= 96rem) {\n      max-width: 96rem;\n    }\n  }\n  .mt-1 {\n    margin-top: calc(var(--spacing) * 1);\n  }\n  .mr-2 {\n    margin-right: calc(var(--spacing) * 2);\n  }\n  .ml-0 {\n    margin-left: calc(var(--spacing) * 0);\n  }\n  .block {\n    display: block;\n  }\n  .flex {\n    display: flex;\n  }\n  .field-sizing-content {\n    field-sizing: content;\n  }\n  .\\!h-4 {\n    height: calc(var(--spacing) * 4) !important;\n  }\n  .h-8 {\n    height: calc(var(--spacing) * 8);\n  }\n  .h-\\[200px\\] {\n    height: 200px;\n  }\n  .h-full {\n    height: 100%;\n  }\n  .max-h-\\[200px\\] {\n    max-height: 200px;\n  }\n  .min-h-16 {\n    min-height: calc(var(--spacing) * 16);\n  }\n  .\\!w-4 {\n    width: calc(var(--spacing) * 4) !important;\n  }\n  .w-8 {\n    width: calc(var(--spacing) * 8);\n  }\n  .w-full {\n    width: 100%;\n  }\n  .max-w-\\[435px\\] {\n    max-width: 435px;\n  }\n  .min-w-\\[8rem\\] {\n    min-width: 8rem;\n  }\n  .-translate-x-1\\/2 {\n    --tw-translate-x: calc(calc(1/2 * 100%) * -1);\n    translate: var(--tw-translate-x) var(--tw-translate-y);\n  }\n  .-translate-y-1\\/2 {\n    --tw-translate-y: calc(calc(1/2 * 100%) * -1);\n    translate: var(--tw-translate-x) var(--tw-translate-y);\n  }\n  .transform {\n    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);\n  }\n  .animate-spin {\n    animation: var(--animate-spin);\n  }\n  .cursor-default {\n    cursor: default;\n  }\n  .resize {\n    resize: both;\n  }\n  .resize-none {\n    resize: none;\n  }\n  .flex-col {\n    flex-direction: column;\n  }\n  .items-center {\n    align-items: center;\n  }\n  .items-start {\n    align-items: flex-start;\n  }\n  .justify-center {\n    justify-content: center;\n  }\n  .gap-0\\.5 {\n    gap: calc(var(--spacing) * 0.5);\n  }\n  .gap-2 {\n    gap: calc(var(--spacing) * 2);\n  }\n  .overflow-hidden {\n    overflow: hidden;\n  }\n  .overflow-y-auto {\n    overflow-y: auto;\n  }\n  .rounded-md {\n    border-radius: calc(var(--radius) - 2px);\n  }\n  .rounded-sm {\n    border-radius: calc(var(--radius) - 4px);\n  }\n  .border {\n    border-style: var(--tw-border-style);\n    border-width: 1px;\n  }\n  .\\!border-none {\n    --tw-border-style: none !important;\n    border-style: none !important;\n  }\n  .border-input {\n    border-color: var(--input);\n  }\n  .bg-black\\/20 {\n    background-color: color-mix(in srgb, #000 20%, transparent);\n    @supports (color: color-mix(in lab, red, red)) {\n      background-color: color-mix(in oklab, var(--color-black) 20%, transparent);\n    }\n  }\n  .bg-popover {\n    background-color: var(--popover);\n  }\n  .bg-transparent {\n    background-color: transparent;\n  }\n  .fill-black {\n    fill: var(--color-black);\n  }\n  .p-0 {\n    padding: calc(var(--spacing) * 0);\n  }\n  .p-1 {\n    padding: calc(var(--spacing) * 1);\n  }\n  .p-2 {\n    padding: calc(var(--spacing) * 2);\n  }\n  .px-0\\.5 {\n    padding-inline: calc(var(--spacing) * 0.5);\n  }\n  .px-2 {\n    padding-inline: calc(var(--spacing) * 2);\n  }\n  .px-3 {\n    padding-inline: calc(var(--spacing) * 3);\n  }\n  .px-4 {\n    padding-inline: calc(var(--spacing) * 4);\n  }\n  .py-1\\.5 {\n    padding-block: calc(var(--spacing) * 1.5);\n  }\n  .py-2 {\n    padding-block: calc(var(--spacing) * 2);\n  }\n  .py-3 {\n    padding-block: calc(var(--spacing) * 3);\n  }\n  .text-base {\n    font-size: var(--text-base);\n    line-height: var(--tw-leading, var(--text-base--line-height));\n  }\n  .text-sm {\n    font-size: var(--text-sm);\n    line-height: var(--tw-leading, var(--text-sm--line-height));\n  }\n  .text-xs {\n    font-size: var(--text-xs);\n    line-height: var(--tw-leading, var(--text-xs--line-height));\n  }\n  .text-\\[15px\\] {\n    font-size: 15px;\n  }\n  .font-semibold {\n    --tw-font-weight: var(--font-weight-semibold);\n    font-weight: var(--font-weight-semibold);\n  }\n  .text-gray-500 {\n    color: var(--color-gray-500);\n  }\n  .text-popover-foreground {\n    color: var(--popover-foreground);\n  }\n  .text-white {\n    color: var(--color-white);\n  }\n  .\\!shadow-none {\n    --tw-shadow: 0 0 #0000 !important;\n    box-shadow:\n      var(--tw-inset-shadow),\n      var(--tw-inset-ring-shadow),\n      var(--tw-ring-offset-shadow),\n      var(--tw-ring-shadow),\n      var(--tw-shadow) !important;\n  }\n  .shadow-md {\n    --tw-shadow: 0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 2px 4px -2px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\n    box-shadow:\n      var(--tw-inset-shadow),\n      var(--tw-inset-ring-shadow),\n      var(--tw-ring-offset-shadow),\n      var(--tw-ring-shadow),\n      var(--tw-shadow);\n  }\n  .shadow-xs {\n    --tw-shadow: 0 1px 2px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.05));\n    box-shadow:\n      var(--tw-inset-shadow),\n      var(--tw-inset-ring-shadow),\n      var(--tw-ring-offset-shadow),\n      var(--tw-ring-shadow),\n      var(--tw-shadow);\n  }\n  .\\!ring-0 {\n    --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor) !important;\n    box-shadow:\n      var(--tw-inset-shadow),\n      var(--tw-inset-ring-shadow),\n      var(--tw-ring-offset-shadow),\n      var(--tw-ring-shadow),\n      var(--tw-shadow) !important;\n  }\n  .ring {\n    --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);\n    box-shadow:\n      var(--tw-inset-shadow),\n      var(--tw-inset-ring-shadow),\n      var(--tw-ring-offset-shadow),\n      var(--tw-ring-shadow),\n      var(--tw-shadow);\n  }\n  .outline-hidden {\n    --tw-outline-style: none;\n    outline-style: none;\n    @media (forced-colors: active) {\n      outline: 2px solid transparent;\n      outline-offset: 2px;\n    }\n  }\n  .outline {\n    outline-style: var(--tw-outline-style);\n    outline-width: 1px;\n  }\n  .transition {\n    transition-property:\n      color,\n      background-color,\n      border-color,\n      outline-color,\n      text-decoration-color,\n      fill,\n      stroke,\n      --tw-gradient-from,\n      --tw-gradient-via,\n      --tw-gradient-to,\n      opacity,\n      box-shadow,\n      transform,\n      translate,\n      scale,\n      rotate,\n      filter,\n      -webkit-backdrop-filter,\n      backdrop-filter,\n      display,\n      visibility,\n      content-visibility,\n      overlay,\n      pointer-events;\n    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n    transition-duration: var(--tw-duration, var(--default-transition-duration));\n  }\n  .transition-\\[color\\,box-shadow\\] {\n    transition-property: color, box-shadow;\n    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n    transition-duration: var(--tw-duration, var(--default-transition-duration));\n  }\n  .ease-in-out {\n    --tw-ease: var(--ease-in-out);\n    transition-timing-function: var(--ease-in-out);\n  }\n  .outline-none {\n    --tw-outline-style: none;\n    outline-style: none;\n  }\n  .select-none {\n    -webkit-user-select: none;\n    -moz-user-select: none;\n    user-select: none;\n  }\n  .placeholder\\:text-muted-foreground {\n    &::-moz-placeholder {\n      color: var(--muted-foreground);\n    }\n    &::placeholder {\n      color: var(--muted-foreground);\n    }\n  }\n  .focus\\:outline-none {\n    &:focus {\n      --tw-outline-style: none;\n      outline-style: none;\n    }\n  }\n  .focus-visible\\:border-ring {\n    &:focus-visible {\n      border-color: var(--ring);\n    }\n  }\n  .focus-visible\\:ring-1 {\n    &:focus-visible {\n      --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);\n      box-shadow:\n        var(--tw-inset-shadow),\n        var(--tw-inset-ring-shadow),\n        var(--tw-ring-offset-shadow),\n        var(--tw-ring-shadow),\n        var(--tw-shadow);\n    }\n  }\n  .focus-visible\\:ring-\\[3px\\] {\n    &:focus-visible {\n      --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);\n      box-shadow:\n        var(--tw-inset-shadow),\n        var(--tw-inset-ring-shadow),\n        var(--tw-ring-offset-shadow),\n        var(--tw-ring-shadow),\n        var(--tw-shadow);\n    }\n  }\n  .focus-visible\\:ring-ring {\n    &:focus-visible {\n      --tw-ring-color: var(--ring);\n    }\n  }\n  .focus-visible\\:ring-ring\\/50 {\n    &:focus-visible {\n      --tw-ring-color: var(--ring);\n      @supports (color: color-mix(in lab, red, red)) {\n        --tw-ring-color: color-mix(in oklab, var(--ring) 50%, transparent);\n      }\n    }\n  }\n  .focus-visible\\:outline-hidden {\n    &:focus-visible {\n      --tw-outline-style: none;\n      outline-style: none;\n      @media (forced-colors: active) {\n        outline: 2px solid transparent;\n        outline-offset: 2px;\n      }\n    }\n  }\n  .disabled\\:cursor-not-allowed {\n    &:disabled {\n      cursor: not-allowed;\n    }\n  }\n  .disabled\\:opacity-50 {\n    &:disabled {\n      opacity: 50%;\n    }\n  }\n  .aria-invalid\\:border-destructive {\n    &[aria-invalid=true] {\n      border-color: var(--destructive);\n    }\n  }\n  .aria-invalid\\:ring-destructive\\/20 {\n    &[aria-invalid=true] {\n      --tw-ring-color: var(--destructive);\n      @supports (color: color-mix(in lab, red, red)) {\n        --tw-ring-color: color-mix(in oklab, var(--destructive) 20%, transparent);\n      }\n    }\n  }\n  .data-disabled\\:pointer-events-none {\n    &[data-disabled] {\n      pointer-events: none;\n    }\n  }\n  .data-disabled\\:opacity-50 {\n    &[data-disabled] {\n      opacity: 50%;\n    }\n  }\n  .data-highlighted\\:bg-accent {\n    &[data-highlighted] {\n      background-color: var(--accent);\n    }\n  }\n  .data-highlighted\\:text-accent-foreground {\n    &[data-highlighted] {\n      color: var(--accent-foreground);\n    }\n  }\n  .\\*\\*\\:data-tag\\:rounded {\n    :is(& *) {\n      &[data-tag] {\n        border-radius: 0.25rem;\n      }\n    }\n  }\n  .\\*\\*\\:data-tag\\:bg-blue-200 {\n    :is(& *) {\n      &[data-tag] {\n        background-color: var(--color-blue-200);\n      }\n    }\n  }\n  .\\*\\*\\:data-tag\\:py-px {\n    :is(& *) {\n      &[data-tag] {\n        padding-block: 1px;\n      }\n    }\n  }\n  .\\*\\*\\:data-tag\\:text-blue-950 {\n    :is(& *) {\n      &[data-tag] {\n        color: var(--color-blue-950);\n      }\n    }\n  }\n  .md\\:text-sm {\n    @media (width >= 48rem) {\n      font-size: var(--text-sm);\n      line-height: var(--tw-leading, var(--text-sm--line-height));\n    }\n  }\n  .dark\\:bg-input\\/30 {\n    &:is(.dark *) {\n      background-color: var(--input);\n      @supports (color: color-mix(in lab, red, red)) {\n        background-color: color-mix(in oklab, var(--input) 30%, transparent);\n      }\n    }\n  }\n  .dark\\:text-gray-600 {\n    &:is(.dark *) {\n      color: var(--color-gray-600);\n    }\n  }\n  .dark\\:aria-invalid\\:ring-destructive\\/40 {\n    &:is(.dark *) {\n      &[aria-invalid=true] {\n        --tw-ring-color: var(--destructive);\n        @supports (color: color-mix(in lab, red, red)) {\n          --tw-ring-color: color-mix(in oklab, var(--destructive) 40%, transparent);\n        }\n      }\n    }\n  }\n  .dark\\:\\*\\*\\:data-tag\\:bg-blue-800 {\n    &:is(.dark *) {\n      :is(& *) {\n        &[data-tag] {\n          background-color: var(--color-blue-800);\n        }\n      }\n    }\n  }\n  .dark\\:\\*\\*\\:data-tag\\:text-blue-50 {\n    &:is(.dark *) {\n      :is(& *) {\n        &[data-tag] {\n          color: var(--color-blue-50);\n        }\n      }\n    }\n  }\n}\n:root {\n  --radius: 0.625rem;\n  --background: oklch(1 0 0);\n  --foreground: oklch(0.145 0 0);\n  --card: oklch(1 0 0);\n  --card-foreground: oklch(0.145 0 0);\n  --popover: oklch(1 0 0);\n  --popover-foreground: oklch(0.145 0 0);\n  --primary: #7F56D9;\n  --primary-foreground: oklch(0.985 0 0);\n  --secondary: oklch(0.97 0 0);\n  --secondary-foreground: oklch(0.205 0 0);\n  --muted: oklch(0.97 0 0);\n  --muted-foreground: oklch(0.556 0 0);\n  --accent: oklch(0.97 0 0);\n  --accent-foreground: oklch(0.205 0 0);\n  --destructive: oklch(0.577 0.245 27.325);\n  --border: oklch(0.922 0 0);\n  --input: oklch(0.922 0 0);\n  --ring: oklch(0.708 0 0);\n  --chart-1: oklch(0.646 0.222 41.116);\n  --chart-2: oklch(0.6 0.118 184.704);\n  --chart-3: oklch(0.398 0.07 227.392);\n  --chart-4: oklch(0.828 0.189 84.429);\n  --chart-5: oklch(0.769 0.188 70.08);\n  --sidebar: oklch(0.985 0 0);\n  --sidebar-foreground: oklch(0.145 0 0);\n  --sidebar-primary: oklch(0.205 0 0);\n  --sidebar-primary-foreground: oklch(0.985 0 0);\n  --sidebar-accent: oklch(0.97 0 0);\n  --sidebar-accent-foreground: oklch(0.205 0 0);\n  --sidebar-border: oklch(0.922 0 0);\n  --sidebar-ring: oklch(0.708 0 0);\n}\n.dark {\n  --background: oklch(0.145 0 0);\n  --foreground: oklch(0.985 0 0);\n  --card: oklch(0.205 0 0);\n  --card-foreground: oklch(0.985 0 0);\n  --popover: oklch(0.205 0 0);\n  --popover-foreground: oklch(0.985 0 0);\n  --primary: oklch(0.922 0 0);\n  --primary-foreground: oklch(0.205 0 0);\n  --secondary: oklch(0.269 0 0);\n  --secondary-foreground: oklch(0.985 0 0);\n  --muted: oklch(0.269 0 0);\n  --muted-foreground: oklch(0.708 0 0);\n  --accent: oklch(0.269 0 0);\n  --accent-foreground: oklch(0.985 0 0);\n  --destructive: oklch(0.704 0.191 22.216);\n  --border: oklch(1 0 0 / 10%);\n  --input: oklch(1 0 0 / 15%);\n  --ring: oklch(0.556 0 0);\n  --chart-1: oklch(0.488 0.243 264.376);\n  --chart-2: oklch(0.696 0.17 162.48);\n  --chart-3: oklch(0.769 0.188 70.08);\n  --chart-4: oklch(0.627 0.265 303.9);\n  --chart-5: oklch(0.645 0.246 16.439);\n  --sidebar: oklch(0.205 0 0);\n  --sidebar-foreground: oklch(0.985 0 0);\n  --sidebar-primary: oklch(0.488 0.243 264.376);\n  --sidebar-primary-foreground: oklch(0.985 0 0);\n  --sidebar-accent: oklch(0.269 0 0);\n  --sidebar-accent-foreground: oklch(0.985 0 0);\n  --sidebar-border: oklch(1 0 0 / 10%);\n  --sidebar-ring: oklch(0.556 0 0);\n}\n@property --tw-translate-x { syntax: "*"; inherits: false; initial-value: 0; }\n@property --tw-translate-y { syntax: "*"; inherits: false; initial-value: 0; }\n@property --tw-translate-z { syntax: "*"; inherits: false; initial-value: 0; }\n@property --tw-rotate-x { syntax: "*"; inherits: false; }\n@property --tw-rotate-y { syntax: "*"; inherits: false; }\n@property --tw-rotate-z { syntax: "*"; inherits: false; }\n@property --tw-skew-x { syntax: "*"; inherits: false; }\n@property --tw-skew-y { syntax: "*"; inherits: false; }\n@property --tw-border-style { syntax: "*"; inherits: false; initial-value: solid; }\n@property --tw-font-weight { syntax: "*"; inherits: false; }\n@property --tw-shadow { syntax: "*"; inherits: false; initial-value: 0 0 #0000; }\n@property --tw-shadow-color { syntax: "*"; inherits: false; }\n@property --tw-shadow-alpha { syntax: "<percentage>"; inherits: false; initial-value: 100%; }\n@property --tw-inset-shadow { syntax: "*"; inherits: false; initial-value: 0 0 #0000; }\n@property --tw-inset-shadow-color { syntax: "*"; inherits: false; }\n@property --tw-inset-shadow-alpha { syntax: "<percentage>"; inherits: false; initial-value: 100%; }\n@property --tw-ring-color { syntax: "*"; inherits: false; }\n@property --tw-ring-shadow { syntax: "*"; inherits: false; initial-value: 0 0 #0000; }\n@property --tw-inset-ring-color { syntax: "*"; inherits: false; }\n@property --tw-inset-ring-shadow { syntax: "*"; inherits: false; initial-value: 0 0 #0000; }\n@property --tw-ring-inset { syntax: "*"; inherits: false; }\n@property --tw-ring-offset-width { syntax: "<length>"; inherits: false; initial-value: 0px; }\n@property --tw-ring-offset-color { syntax: "*"; inherits: false; initial-value: #fff; }\n@property --tw-ring-offset-shadow { syntax: "*"; inherits: false; initial-value: 0 0 #0000; }\n@property --tw-outline-style { syntax: "*"; inherits: false; initial-value: solid; }\n@property --tw-ease { syntax: "*"; inherits: false; }\n@keyframes spin {\n  to {\n    transform: rotate(360deg);\n  }\n}\n@layer properties {\n  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {\n    *,\n    ::before,\n    ::after,\n    ::backdrop {\n      --tw-translate-x: 0;\n      --tw-translate-y: 0;\n      --tw-translate-z: 0;\n      --tw-rotate-x: initial;\n      --tw-rotate-y: initial;\n      --tw-rotate-z: initial;\n      --tw-skew-x: initial;\n      --tw-skew-y: initial;\n      --tw-border-style: solid;\n      --tw-font-weight: initial;\n      --tw-shadow: 0 0 #0000;\n      --tw-shadow-color: initial;\n      --tw-shadow-alpha: 100%;\n      --tw-inset-shadow: 0 0 #0000;\n      --tw-inset-shadow-color: initial;\n      --tw-inset-shadow-alpha: 100%;\n      --tw-ring-color: initial;\n      --tw-ring-shadow: 0 0 #0000;\n      --tw-inset-ring-color: initial;\n      --tw-inset-ring-shadow: 0 0 #0000;\n      --tw-ring-inset: initial;\n      --tw-ring-offset-width: 0px;\n      --tw-ring-offset-color: #fff;\n      --tw-ring-offset-shadow: 0 0 #0000;\n      --tw-outline-style: solid;\n      --tw-ease: initial;\n    }\n  }\n}\n');
+
 // src/ElementSelector.tsx
 var import_react = require("react");
 
 // src/utils.ts
+var import_clsx = require("clsx");
+var import_tailwind_merge = require("tailwind-merge");
+function cn(...inputs2) {
+  return (0, import_tailwind_merge.twMerge)((0, import_clsx.clsx)(inputs2));
+}
 var isElementAtPoint = (element, clientX, clientY) => {
   const boundingRect = element.getBoundingClientRect();
   const isInHorizontalBounds = clientX >= boundingRect.left && clientX <= boundingRect.left + boundingRect.width;
@@ -426,7 +466,7 @@ function ElementHighlighter({
 }
 
 // src/ElementInspector.tsx
-var import_react8 = require("react");
+var import_react10 = require("react");
 
 // src/constants.ts
 var UI_CONSTANTS = {
@@ -617,25 +657,6 @@ var buttons = {
     backgroundColor: "#2563eb"
   }
 };
-var inputs = {
-  promptInput: {
-    flexGrow: 1,
-    minHeight: "65px",
-    fontSize: "14px",
-    outline: "none",
-    fontFamily: "inherit",
-    borderColor: "transparent",
-    padding: 0,
-    width: "100%"
-  },
-  promptInputFocus: {
-    borderColor: "#3b82f6",
-    boxShadow: "0 0 0 1px rgba(59, 130, 246, 0.5)"
-  },
-  promptInputSelected: {
-    borderColor: "transparent"
-  }
-};
 var elements = {
   elementTagLabel: {
     position: "absolute",
@@ -710,19 +731,6 @@ var formContainerStyles = {
     width: "100%"
   }
 };
-var getPromptTextareaStyles = (isDarkMode, selectedElementsCount) => {
-  return {
-    textarea: {
-      ...inputs.promptInput,
-      ...isDarkMode ? darkMode.promptInput : {},
-      ...selectedElementsCount > 0 ? inputs.promptInputSelected : {},
-      resize: "none",
-      minHeight: "62px",
-      // Height for approximately 3 lines
-      lineHeight: "1.5"
-    }
-  };
-};
 var submitButtonStyles = {
   button: {
     ...buttons.submitButton,
@@ -736,8 +744,334 @@ var submitButtonStyles = {
   normalBackgroundColor: buttons.submitButton.backgroundColor
 };
 
-// src/components/PromptForm.tsx
+// src/components/MentionChat.tsx
+var import_find = __toESM(require("lodash/find"));
+var import_get2 = __toESM(require("lodash/get"));
+var import_last = __toESM(require("lodash/last"));
+var import_react4 = require("react");
+
+// src/services/api-client.ts
+var import_axios = __toESM(require("axios"));
+var apiClient = import_axios.default.create({
+  baseURL: "https://platform.api.simplifyx.app/api/v1",
+  headers: {
+    "Content-type": "application/json"
+  }
+});
+apiClient.interceptors.request.use(async function(config) {
+  return config;
+});
+var api_client_default = apiClient;
+
+// src/services/workflows.ts
+var getPaginatedWorkflows = async (params, token) => {
+  var _a;
+  const response = await api_client_default.get(`/workflows/pagination`, {
+    params,
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return (_a = response.data) != null ? _a : {};
+};
+var workflowService = {
+  getPaginatedWorkflows
+};
+var workflows_default = workflowService;
+
+// src/stores/messages.ts
+var import_zustand = require("zustand");
+var import_map = __toESM(require("lodash/map"));
+var useMessagesStore = (0, import_zustand.create)((set, get3) => ({
+  startNodeInputVariables: {},
+  // Default mapping fields to show in UI based on the screenshot
+  mappingFields: [],
+  setStartNodeInputVariables: (variables) => {
+    set({ mappingFields: (0, import_map.default)(variables, (item) => ({
+      payloadField: item.key,
+      referenceField: "",
+      value: "",
+      hasError: false
+    })) });
+  },
+  getMappingFields: () => {
+    return get3().mappingFields;
+  }
+}));
+
+// src/stores/auth.ts
+var import_zustand2 = require("zustand");
+var useAuthStore = (0, import_zustand2.create)()((set, get3) => ({
+  // Initial state
+  accessToken: null,
+  // Actions to update auth state
+  setAccessToken: (token) => set({
+    accessToken: token
+  }),
+  getAccessToken: () => {
+    return get3().accessToken;
+  }
+}));
+
+// src/components/Mapper.tsx
+var import_get = __toESM(require("lodash/get"));
+var import_map2 = __toESM(require("lodash/map"));
+var import_size = __toESM(require("lodash/size"));
+var import_react3 = __toESM(require("react"));
+var import_isEmpty = __toESM(require("lodash/isEmpty"));
 var import_jsx_runtime5 = require("react/jsx-runtime");
+var Mapper = ({
+  children,
+  data: items = [],
+  extractedKey,
+  isShowEmpty = false
+}) => {
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_react3.default.Fragment, { children: !(0, import_isEmpty.default)(items) ? (0, import_map2.default)(items, (item, index) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+    import_react3.default.Fragment,
+    {
+      children: children(item, {
+        index: +index,
+        firstItem: +index === 0,
+        lastItem: (0, import_size.default)(items) - 1 === +index,
+        isOdd: +index % 2 !== 0
+      })
+    },
+    extractedKey ? (0, import_get.default)(item, extractedKey, index) : index
+  )) : isShowEmpty && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("p", { className: "px-4 py-3 text-[15px] text-gray-500", children: "No data found." }) });
+};
+var Mapper_default = Mapper;
+
+// src/components/Spinner.tsx
+var import_jsx_runtime6 = require("react/jsx-runtime");
+var Spinner = ({ className = "" }) => {
+  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { role: "status", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
+      "svg",
+      {
+        "aria-hidden": "true",
+        className: cn("mr-2 h-8 w-8 animate-spin fill-black text-white dark:text-gray-600", className),
+        viewBox: "0 0 100 101",
+        fill: "none",
+        xmlns: "http://www.w3.org/2000/svg",
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+            "path",
+            {
+              d: "M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z",
+              fill: "currentColor"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+            "path",
+            {
+              d: "M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z",
+              fill: "currentFill"
+            }
+          )
+        ]
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "sr-only", children: "Loading..." })
+  ] });
+};
+var Spinner_default = Spinner;
+
+// src/components/ui/mention.tsx
+var MentionPrimitive = __toESM(require("@diceui/mention"));
+var React4 = __toESM(require("react"));
+var import_jsx_runtime7 = require("react/jsx-runtime");
+var Mention = React4.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+  MentionPrimitive.Root,
+  {
+    "data-slot": "mention",
+    ref,
+    className: cn(
+      "**:data-tag:rounded **:data-tag:bg-blue-200 **:data-tag:py-px **:data-tag:text-blue-950 dark:**:data-tag:bg-blue-800 dark:**:data-tag:text-blue-50",
+      className
+    ),
+    ...props
+  }
+));
+Mention.displayName = MentionPrimitive.Root.displayName;
+var MentionLabel = React4.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+  MentionPrimitive.Label,
+  {
+    "data-slot": "mention-label",
+    ref,
+    className: cn("px-0.5 py-1.5 font-semibold text-sm", className),
+    ...props
+  }
+));
+MentionLabel.displayName = MentionPrimitive.Label.displayName;
+var MentionInput = React4.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+  MentionPrimitive.Input,
+  {
+    "data-slot": "mention-input",
+    ref,
+    className: cn(
+      "flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+      className
+    ),
+    ...props
+  }
+));
+MentionInput.displayName = MentionPrimitive.Input.displayName;
+var MentionContent = React4.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(MentionPrimitive.Portal, { children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+  MentionPrimitive.Content,
+  {
+    "data-slot": "mention-content",
+    ref,
+    className: cn(
+      "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-[state=closed]:animate-out data-[state=open]:animate-in",
+      className
+    ),
+    ...props,
+    children
+  }
+) }));
+MentionContent.displayName = MentionPrimitive.Content.displayName;
+var MentionItem = React4.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+  MentionPrimitive.Item,
+  {
+    "data-slot": "mention-item",
+    ref,
+    className: cn(
+      "relative flex w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden data-disabled:pointer-events-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:opacity-50",
+      className
+    ),
+    ...props,
+    children
+  }
+));
+MentionItem.displayName = MentionPrimitive.Item.displayName;
+
+// src/components/ui/textarea.tsx
+var import_jsx_runtime8 = require("react/jsx-runtime");
+function Textarea({ className, ...props }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    "textarea",
+    {
+      "data-slot": "textarea",
+      className: cn(
+        "border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        className
+      ),
+      ...props
+    }
+  );
+}
+
+// src/components/MentionChat.tsx
+var import_jsx_runtime9 = require("react/jsx-runtime");
+var MentionChat = ({
+  textareaRef,
+  input = "",
+  showWorkbench = false,
+  handleInputChange,
+  setCurrentTab,
+  scrollToBottom,
+  style,
+  textAreaClassName = "",
+  mentionContentClassName = ""
+}) => {
+  console.log("input", input);
+  const [isMentionOpen, setIsMentionOpen] = (0, import_react4.useState)(false);
+  const mentionRef = (0, import_react4.useRef)(null);
+  const [values, setValues] = (0, import_react4.useState)([]);
+  const [isLoading, setIsLoading] = (0, import_react4.useState)(false);
+  const [workflows, setWorkflows] = (0, import_react4.useState)([]);
+  const fetchData = (0, import_react4.useCallback)(async () => {
+    try {
+      setIsLoading(true);
+      const res = await workflows_default.getPaginatedWorkflows({
+        page: 1,
+        per_page: 100
+      }, useAuthStore.getState().accessToken);
+      setWorkflows(res.data);
+    } catch (error) {
+      console.log("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+  const currentWorkflow = (0, import_react4.useMemo)(() => {
+    const name = (0, import_last.default)(values) || "";
+    return (0, import_find.default)(workflows, { name }) || {};
+  }, [values, workflows]);
+  const flowDataNodes = (0, import_react4.useMemo)(() => {
+    try {
+      return (0, import_get2.default)(JSON.parse((0, import_get2.default)(currentWorkflow, "flowData", "{}")), "nodes", []);
+    } catch (error) {
+      console.error("Error parsing flowData:", error);
+      return [];
+    }
+  }, [currentWorkflow]);
+  const startNodeInputVariables = (0, import_react4.useMemo)(() => {
+    return (0, import_get2.default)((0, import_find.default)(flowDataNodes, { type: "startNode" }) || {}, "data.inputs.variables", {});
+  }, [flowDataNodes]);
+  (0, import_react4.useEffect)(() => {
+    fetchData();
+  }, [fetchData]);
+  (0, import_react4.useEffect)(() => {
+    useMessagesStore.getState().setStartNodeInputVariables(startNodeInputVariables);
+  }, [startNodeInputVariables]);
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
+    Mention,
+    {
+      trigger: "@",
+      className: cn(
+        "w-full p-2 focus:outline-none resize-none text-md text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary bg-transparent",
+        {
+          "max-w-[435px] ml-0": showWorkbench
+        }
+      ),
+      onOpenChange: setIsMentionOpen,
+      inputValue: input,
+      onInputValueChange: (value) => {
+        handleInputChange == null ? void 0 : handleInputChange({ target: { value } });
+      },
+      value: values,
+      onValueChange: setValues,
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(MentionInput, { placeholder: "Tell me how to modify this element...\nI can help change its style, content, or\nbehavior.", asChild: true, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+          Textarea,
+          {
+            ref: textareaRef,
+            className: cn(
+              "!shadow-none !ring-0 !border-none w-full p-2 focus:outline-none resize-none text-md text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary bg-transparent",
+              {
+                "max-w-[435px] ml-0": showWorkbench
+              },
+              textAreaClassName
+            ),
+            onChange: handleInputChange,
+            value: input,
+            style,
+            translate: "no"
+          }
+        ) }),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(MentionContent, { ref: mentionRef, className: cn("max-h-[200px] h-[200px] overflow-y-auto relative", mentionContentClassName), children: [
+          isLoading && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("div", { className: "absolute left-1/2 top-1/2 z-[9] h-full w-full -translate-x-1/2 -translate-y-1/2 bg-black/20", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("div", { className: "flex h-full w-full items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Spinner_default, { className: "!h-4 !w-4" }) }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Mapper_default, { data: workflows, extractedKey: "id", children: (item) => /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
+            MentionItem,
+            {
+              value: item.name,
+              label: item.name,
+              className: "flex-col items-start gap-0.5",
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "text-sm", children: item.name }),
+                /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "text-xs text-gray-500", children: item.id })
+              ]
+            }
+          ) })
+        ] })
+      ]
+    }
+  );
+};
+
+// src/components/PromptForm.tsx
+var import_jsx_runtime10 = require("react/jsx-runtime");
 function PromptForm({
   userPrompt,
   setUserPrompt,
@@ -745,21 +1079,20 @@ function PromptForm({
   selectedElementsCount,
   isDarkMode
 }) {
-  const textareaStyles = getPromptTextareaStyles(isDarkMode, selectedElementsCount);
-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("form", { onSubmit: handlePromptSubmit, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: formContainerStyles.wrapper, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: formContainerStyles.inputWrapper, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "mt-1", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(IconAi, {}) }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
-        "textarea",
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("form", { onSubmit: handlePromptSubmit, children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { style: formContainerStyles.wrapper, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { style: formContainerStyles.inputWrapper, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("div", { className: "mt-1", children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(IconAi, {}) }),
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+        MentionChat,
         {
-          value: userPrompt,
-          onChange: (e) => setUserPrompt(e.target.value),
-          style: textareaStyles.textarea,
-          placeholder: "Tell me how to modify this element...\nI can help change its style, content, or\nbehavior."
+          input: userPrompt,
+          handleInputChange: (e) => setUserPrompt(e.target.value),
+          textAreaClassName: "p-0",
+          mentionContentClassName: "z-[10001]"
         }
       )
     ] }),
-    userPrompt.trim() !== "" && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+    userPrompt.trim() !== "" && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
       "button",
       {
         type: "submit",
@@ -770,7 +1103,7 @@ function PromptForm({
         onMouseOut: (e) => {
           e.currentTarget.style.backgroundColor = submitButtonStyles.normalBackgroundColor;
         },
-        children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(IconTick, {})
+        children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(IconTick, {})
       }
     )
   ] }) });
@@ -797,7 +1130,7 @@ var getExpandedMenuStyles = (top, left, isDarkMode) => {
 };
 
 // src/components/bubble-menu/ExpandedMenu.tsx
-var import_jsx_runtime6 = require("react/jsx-runtime");
+var import_jsx_runtime11 = require("react/jsx-runtime");
 var ExpandedMenu = ({
   bubblePosition,
   userPrompt,
@@ -807,7 +1140,7 @@ var ExpandedMenu = ({
   isDarkMode
 }) => {
   const styles = getExpandedMenuStyles(bubblePosition.top, bubblePosition.left, isDarkMode);
-  return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "element-inspector-controls", style: styles.container, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { className: "element-inspector-controls", style: styles.container, children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
     PromptForm,
     {
       userPrompt,
@@ -835,7 +1168,7 @@ var getBubbleMenuButtonStyles = (isInspecting) => {
 };
 
 // src/components/BubbleMenuButton.tsx
-var import_jsx_runtime7 = require("react/jsx-runtime");
+var import_jsx_runtime12 = require("react/jsx-runtime");
 function BubbleMenuButton({
   isInspecting,
   onClick
@@ -848,7 +1181,7 @@ function BubbleMenuButton({
   const handleMouseOut = (e) => {
     e.currentTarget.style.backgroundColor = styles.normalBackgroundColor;
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
     "button",
     {
       onClick,
@@ -856,29 +1189,29 @@ function BubbleMenuButton({
       onMouseOver: handleMouseOver,
       onMouseOut: handleMouseOut,
       title,
-      children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(IconSquareDashedPointer, {})
+      children: /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(IconSquareDashedPointer, {})
     }
   );
 }
 
 // src/components/bubble-menu/FloatingButton.tsx
-var import_jsx_runtime8 = require("react/jsx-runtime");
+var import_jsx_runtime13 = require("react/jsx-runtime");
 var FloatingButton = ({
   isInspecting,
   onToggle
 }) => {
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
     "div",
     {
       className: "element-inspector-floating-button-container",
       style: floatingButtonStyles.container,
-      children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(BubbleMenuButton, { isInspecting, onClick: onToggle })
+      children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(BubbleMenuButton, { isInspecting, onClick: onToggle })
     }
   );
 };
 
 // src/components/bubble-menu/BubbleMenu.tsx
-var import_jsx_runtime9 = require("react/jsx-runtime");
+var import_jsx_runtime14 = require("react/jsx-runtime");
 var BubbleMenu = ({
   isInspecting,
   selectedElements,
@@ -892,9 +1225,9 @@ var BubbleMenu = ({
   showBubbleMenuButton
 }) => {
   const showMenu = isInspecting && selectedElements.length > 0;
-  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "element-inspector-bubble", children: [
-    showMenu && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_jsx_runtime9.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "element-inspector-bubble", children: [
+    showMenu && /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(import_jsx_runtime14.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
         MenuArrow,
         {
           isMenuAboveElement,
@@ -903,7 +1236,7 @@ var BubbleMenu = ({
           isVisible: selectedElements.length > 0
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
         ExpandedMenu,
         {
           bubblePosition,
@@ -915,7 +1248,7 @@ var BubbleMenu = ({
         }
       )
     ] }),
-    showBubbleMenuButton && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+    showBubbleMenuButton && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
       FloatingButton,
       {
         isInspecting,
@@ -926,9 +1259,9 @@ var BubbleMenu = ({
 };
 
 // src/components/ElementTagLabel.tsx
-var import_jsx_runtime10 = require("react/jsx-runtime");
+var import_jsx_runtime15 = require("react/jsx-runtime");
 function ElementTagLabel({ element }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("div", { style: elements.elementTagLabel, children: element.tagName.toLowerCase() });
+  return /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { style: elements.elementTagLabel, children: element.tagName.toLowerCase() });
 }
 
 // src/styles/highlights-styles.ts
@@ -946,42 +1279,42 @@ var selectedElementStyles = {
 };
 
 // src/components/highlights/HoveredElement.tsx
-var import_jsx_runtime11 = require("react/jsx-runtime");
+var import_jsx_runtime16 = require("react/jsx-runtime");
 var HoveredElement = ({
   hoveredElement,
   elementLabel,
   highlighterStyle
 }) => {
   if (!hoveredElement) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
     ElementHighlighter,
     {
       element: hoveredElement,
       borderColor: hoveredElementStyles.highlighter.borderColor,
       backgroundColor: hoveredElementStyles.highlighter.backgroundColor,
       style: highlighterStyle,
-      children: elementLabel ? elementLabel(hoveredElement) : /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(ElementTagLabel, { element: hoveredElement })
+      children: elementLabel ? elementLabel(hoveredElement) : /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(ElementTagLabel, { element: hoveredElement })
     }
   );
 };
 
 // src/components/highlights/SelectedElements.tsx
-var import_jsx_runtime12 = require("react/jsx-runtime");
+var import_jsx_runtime17 = require("react/jsx-runtime");
 var SelectedElements = ({
   selectedElements,
   elementLabel,
   highlighterStyle
 }) => {
-  return /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(import_jsx_runtime12.Fragment, { children: selectedElements.map((element, index) => {
+  return /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(import_jsx_runtime17.Fragment, { children: selectedElements.map((element, index) => {
     element.setAttribute("data-element-inspector-selected", "true");
-    return /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(
       ElementHighlighter,
       {
         element,
         borderColor: selectedElementStyles.highlighter.borderColor,
         backgroundColor: selectedElementStyles.highlighter.backgroundColor,
         style: highlighterStyle,
-        children: elementLabel ? elementLabel(element) : /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(ElementTagLabel, { element })
+        children: elementLabel ? elementLabel(element) : /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(ElementTagLabel, { element })
       },
       `selected-${index}`
     );
@@ -989,7 +1322,7 @@ var SelectedElements = ({
 };
 
 // src/components/InspectionOverlay.tsx
-var import_jsx_runtime13 = require("react/jsx-runtime");
+var import_jsx_runtime18 = require("react/jsx-runtime");
 var InspectionOverlay = ({
   isInspecting,
   hoveredElement,
@@ -1003,8 +1336,8 @@ var InspectionOverlay = ({
   elementLabel
 }) => {
   if (!isInspecting) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_jsx_runtime13.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(import_jsx_runtime18.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(
       ElementSelector,
       {
         onElementHovered,
@@ -1015,7 +1348,7 @@ var InspectionOverlay = ({
         style: selectorStyle
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(
       HoveredElement,
       {
         hoveredElement,
@@ -1023,7 +1356,7 @@ var InspectionOverlay = ({
         highlighterStyle
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(
       SelectedElements,
       {
         selectedElements,
@@ -1035,10 +1368,10 @@ var InspectionOverlay = ({
 };
 
 // src/hooks/useDarkMode.ts
-var import_react3 = require("react");
+var import_react5 = require("react");
 function useDarkMode() {
-  const [isDarkMode, setIsDarkMode] = (0, import_react3.useState)(false);
-  (0, import_react3.useEffect)(() => {
+  const [isDarkMode, setIsDarkMode] = (0, import_react5.useState)(false);
+  (0, import_react5.useEffect)(() => {
     const isDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
     setIsDarkMode(isDark);
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -1050,20 +1383,20 @@ function useDarkMode() {
 }
 
 // src/hooks/useElementBubblePosition.ts
-var import_react4 = require("react");
+var import_react6 = require("react");
 function useElementBubblePosition({
   selectedElements,
   menuHeight = UI_CONSTANTS.MENU_HEIGHT,
   menuWidth = UI_CONSTANTS.MENU_WIDTH,
   spacing = UI_CONSTANTS.SPACING
 }) {
-  const [bubblePosition, setBubblePosition] = (0, import_react4.useState)({
+  const [bubblePosition, setBubblePosition] = (0, import_react6.useState)({
     top: 0,
     left: 0,
     arrowOffset: UI_CONSTANTS.ARROW_LEFT_OFFSET
   });
-  const [isMenuAboveElement, setIsMenuAboveElement] = (0, import_react4.useState)(false);
-  (0, import_react4.useEffect)(() => {
+  const [isMenuAboveElement, setIsMenuAboveElement] = (0, import_react6.useState)(false);
+  (0, import_react6.useEffect)(() => {
     if (selectedElements.length === 0) return;
     const updateBubblePosition = () => {
       const lastElement = selectedElements[selectedElements.length - 1];
@@ -1107,17 +1440,17 @@ function useElementBubblePosition({
 }
 
 // src/hooks/useElementSelection.ts
-var import_react5 = require("react");
+var import_react7 = require("react");
 function useElementSelection({ onElementsSelected } = {}) {
-  const [hoveredElement, setHoveredElement] = (0, import_react5.useState)(null);
-  const [selectedElements, setSelectedElements] = (0, import_react5.useState)([]);
-  const handleElementHovered = (0, import_react5.useCallback)((element) => {
+  const [hoveredElement, setHoveredElement] = (0, import_react7.useState)(null);
+  const [selectedElements, setSelectedElements] = (0, import_react7.useState)([]);
+  const handleElementHovered = (0, import_react7.useCallback)((element) => {
     setHoveredElement(element);
   }, []);
-  const handleElementUnhovered = (0, import_react5.useCallback)(() => {
+  const handleElementUnhovered = (0, import_react7.useCallback)(() => {
     setHoveredElement(null);
   }, []);
-  const handleElementSelected = (0, import_react5.useCallback)((element) => {
+  const handleElementSelected = (0, import_react7.useCallback)((element) => {
     const isElementSelected = selectedElements.includes(element);
     if (isElementSelected) {
       element.removeAttribute("data-element-inspector-selected");
@@ -1134,14 +1467,14 @@ function useElementSelection({ onElementsSelected } = {}) {
       onElementsSelected == null ? void 0 : onElementsSelected(newSelectedElements);
     }
   }, [selectedElements, onElementsSelected]);
-  const clearSelections = (0, import_react5.useCallback)(() => {
+  const clearSelections = (0, import_react7.useCallback)(() => {
     selectedElements.forEach((element) => {
       element.removeAttribute("data-element-inspector-selected");
     });
     setSelectedElements([]);
     onElementsSelected == null ? void 0 : onElementsSelected([]);
   }, [selectedElements, onElementsSelected]);
-  (0, import_react5.useEffect)(() => {
+  (0, import_react7.useEffect)(() => {
     const handleClearSelections = () => {
       clearSelections();
     };
@@ -1150,7 +1483,7 @@ function useElementSelection({ onElementsSelected } = {}) {
       document.removeEventListener("clearElementSelections", handleClearSelections);
     };
   }, [clearSelections]);
-  (0, import_react5.useEffect)(() => {
+  (0, import_react7.useEffect)(() => {
     return () => {
       selectedElements.forEach((element) => {
         element.removeAttribute("data-element-inspector-selected");
@@ -1168,15 +1501,35 @@ function useElementSelection({ onElementsSelected } = {}) {
 }
 
 // src/hooks/useIframeMessaging.ts
-var import_react6 = require("react");
+var import_react8 = require("react");
+var extractElementProperties = (el) => {
+  var _a;
+  return {
+    tagName: el.tagName,
+    id: el.id,
+    className: el.className,
+    textContent: (_a = el.textContent) == null ? void 0 : _a.trim(),
+    attributes: Array.from(el.attributes).map((attr) => ({
+      name: attr.name,
+      value: attr.value
+    }))
+  };
+};
+var mapElementToObject = (el) => {
+  const formElements = Array.from(el.querySelectorAll("input, textarea, select")).filter((formEl) => formEl instanceof HTMLElement).map((formEl) => extractElementProperties(formEl));
+  return {
+    ...extractElementProperties(el),
+    childrens: formElements
+  };
+};
 function useIframeMessaging() {
   const isInIframe = typeof window !== "undefined" && window.self !== window.top;
-  const [activeTab, setActiveTab] = (0, import_react6.useState)(null);
-  const [shouldEnableInspect, setShouldEnableInspect] = (0, import_react6.useState)(!isInIframe);
-  (0, import_react6.useEffect)(() => {
+  const [activeTab, setActiveTab] = (0, import_react8.useState)(null);
+  const [shouldEnableInspect, setShouldEnableInspect] = (0, import_react8.useState)(!isInIframe);
+  (0, import_react8.useEffect)(() => {
     if (!isInIframe) return;
     const handleMessage = (event) => {
-      var _a;
+      var _a, _b;
       if (((_a = event.data) == null ? void 0 : _a.type) === "TAB_CHANGED") {
         const { activeTab: newActiveTab } = event.data.payload || {};
         setActiveTab(newActiveTab);
@@ -1185,6 +1538,8 @@ function useIframeMessaging() {
         } else if (newActiveTab === "design" || newActiveTab === "workflow") {
           setShouldEnableInspect(true);
         }
+      } else if (((_b = event.data) == null ? void 0 : _b.type) === "ACCESS_TOKEN") {
+        useAuthStore.getState().setAccessToken(event.data.payload.token);
       }
     };
     window.addEventListener("message", handleMessage);
@@ -1192,47 +1547,23 @@ function useIframeMessaging() {
       window.removeEventListener("message", handleMessage);
     };
   }, [isInIframe, activeTab]);
-  const sendSelectedElements = (0, import_react6.useCallback)((elements2) => {
+  const sendSelectedElements = (0, import_react8.useCallback)((elements2) => {
     if (!isInIframe) return;
     window.parent.postMessage({
       type: "ELEMENT_INSPECTOR_SELECTED",
       payload: {
-        elements: elements2.map((el) => {
-          var _a;
-          return {
-            tagName: el.tagName,
-            id: el.id,
-            className: el.className,
-            textContent: (_a = el.textContent) == null ? void 0 : _a.trim(),
-            attributes: Array.from(el.attributes).map((attr) => ({
-              name: attr.name,
-              value: attr.value
-            }))
-          };
-        })
+        elements: elements2.map((el) => mapElementToObject(el))
       }
     }, "*");
   }, [isInIframe]);
-  const sendPrompt = (0, import_react6.useCallback)((prompt, elements2) => {
+  const sendPrompt = (0, import_react8.useCallback)((prompt, elements2) => {
     if (!isInIframe) return;
     window.parent.postMessage({
       type: "ELEMENT_INSPECTOR_PROMPT",
       payload: {
         prompt,
         activeTab,
-        elements: elements2.map((el) => {
-          var _a;
-          return {
-            tagName: el.tagName,
-            id: el.id,
-            className: el.className,
-            textContent: (_a = el.textContent) == null ? void 0 : _a.trim(),
-            attributes: Array.from(el.attributes).map((attr) => ({
-              name: attr.name,
-              value: attr.value
-            }))
-          };
-        })
+        elements: elements2.map(mapElementToObject)
       }
     }, "*");
   }, [isInIframe, activeTab]);
@@ -1246,17 +1577,17 @@ function useIframeMessaging() {
 }
 
 // src/hooks/useInspector.ts
-var import_react7 = require("react");
+var import_react9 = require("react");
 function useInspector({
   initialIsActive = true,
   onPromptGenerated
 } = {}) {
-  const [isInspecting, setIsInspecting] = (0, import_react7.useState)(initialIsActive);
-  const [userPrompt, setUserPrompt] = (0, import_react7.useState)("");
-  const toggleInspection = (0, import_react7.useCallback)(() => {
+  const [isInspecting, setIsInspecting] = (0, import_react9.useState)(initialIsActive);
+  const [userPrompt, setUserPrompt] = (0, import_react9.useState)("");
+  const toggleInspection = (0, import_react9.useCallback)(() => {
     setIsInspecting((prev) => !prev);
   }, []);
-  (0, import_react7.useEffect)(() => {
+  (0, import_react9.useEffect)(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape" && isInspecting) {
         setIsInspecting(false);
@@ -1267,7 +1598,7 @@ function useInspector({
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isInspecting]);
-  const generatePrompt = (0, import_react7.useCallback)((elements2, prompt) => {
+  const generatePrompt = (0, import_react9.useCallback)((elements2, prompt) => {
     if (elements2.length === 0 || !prompt.trim()) return;
     const generatedPrompt = createElementsPrompt(elements2, prompt);
     const promptEvent = new CustomEvent("promptGenerated", {
@@ -1277,7 +1608,7 @@ function useInspector({
     onPromptGenerated == null ? void 0 : onPromptGenerated(generatedPrompt, elements2);
     setUserPrompt("");
   }, [onPromptGenerated]);
-  const handlePromptSubmit = (0, import_react7.useCallback)((e, elements2) => {
+  const handlePromptSubmit = (0, import_react9.useCallback)((e, elements2) => {
     e.preventDefault();
     generatePrompt(elements2, userPrompt);
   }, [userPrompt, generatePrompt]);
@@ -1292,7 +1623,7 @@ function useInspector({
 }
 
 // src/ElementInspector.tsx
-var import_jsx_runtime14 = require("react/jsx-runtime");
+var import_jsx_runtime19 = require("react/jsx-runtime");
 function ElementInspector({
   initialIsActive = true,
   excludeSelector = ".element-inspector-bubble, .element-inspector-controls",
@@ -1343,22 +1674,27 @@ function ElementInspector({
       }
     }
   });
-  const handleMenuToggle = (0, import_react8.useCallback)(() => {
+  const handleMenuToggle = (0, import_react10.useCallback)(() => {
     toggleInspection();
     if (isInspecting) {
       clearSelections();
     }
   }, [isInspecting, toggleInspection, clearSelections]);
-  const onSubmitPrompt = (0, import_react8.useCallback)((e) => {
+  const onSubmitPrompt = (0, import_react10.useCallback)((e) => {
     handlePromptSubmit(e, selectedElements);
   }, [handlePromptSubmit, selectedElements]);
-  (0, import_react8.useEffect)(() => {
+  (0, import_react10.useEffect)(() => {
     if (isInIframe && isInspecting !== shouldEnableInspect) {
       toggleInspection();
     }
   }, [isInIframe, isInspecting, shouldEnableInspect, toggleInspection]);
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+  (0, import_react10.useEffect)(() => {
+    if (isInIframe) {
+      window.parent.postMessage({ type: "UI_BUILDER_READY" }, "*");
+    }
+  }, [isInIframe]);
+  return /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
       InspectionOverlay,
       {
         isInspecting,
@@ -1373,7 +1709,7 @@ function ElementInspector({
         elementLabel
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
       BubbleMenu,
       {
         isInspecting,

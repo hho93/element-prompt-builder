@@ -1,33 +1,34 @@
 "use client";
 import React from "react";
 import { IconTick, IconAi } from "../Icons";
-import { 
-  formContainerStyles, 
+import {
+  formContainerStyles,
   getPromptTextareaStyles,
-  submitButtonStyles
+  submitButtonStyles,
 } from "../styles/form-styles";
+import { MentionChat } from "./MentionChat";
 
 interface PromptFormProps {
   /**
    * The current prompt text
    */
   userPrompt: string;
-  
+
   /**
    * Function to update the prompt text
    */
   setUserPrompt: (value: string) => void;
-  
+
   /**
    * Form submission handler
    */
   handlePromptSubmit: (e: React.FormEvent) => void;
-  
+
   /**
    * Number of elements currently selected
    */
   selectedElementsCount: number;
-  
+
   /**
    * Whether dark mode is active
    */
@@ -44,29 +45,39 @@ export function PromptForm({
   selectedElementsCount,
   isDarkMode,
 }: PromptFormProps) {
-  const textareaStyles = getPromptTextareaStyles(isDarkMode, selectedElementsCount);
-  
+  // const textareaStyles = getPromptTextareaStyles(isDarkMode, selectedElementsCount);
+
   return (
     <form onSubmit={handlePromptSubmit}>
       <div style={formContainerStyles.wrapper}>
         <div style={formContainerStyles.inputWrapper}>
-          <div className="mt-1"><IconAi /></div>
-          <textarea
+          <div className="mt-1">
+            <IconAi />
+          </div>
+          <MentionChat
+            input={userPrompt}
+            handleInputChange={(e) => setUserPrompt(e.target.value)}
+            textAreaClassName="p-0"
+            mentionContentClassName="z-[10001]"
+          />
+          {/* <textarea
             value={userPrompt}
             onChange={(e) => setUserPrompt(e.target.value)}
             style={textareaStyles.textarea}
             placeholder={"Tell me how to modify this element...\nI can help change its style, content, or\nbehavior."}
-          />
+          /> */}
         </div>
         {userPrompt.trim() !== "" && (
           <button
             type="submit"
             style={submitButtonStyles.button}
             onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = submitButtonStyles.hoverBackgroundColor;
+              e.currentTarget.style.backgroundColor =
+                submitButtonStyles.hoverBackgroundColor;
             }}
             onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = submitButtonStyles.normalBackgroundColor;
+              e.currentTarget.style.backgroundColor =
+                submitButtonStyles.normalBackgroundColor;
             }}
           >
             <IconTick />
