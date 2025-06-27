@@ -48,7 +48,7 @@ export interface ElementInspectorProps {
  */
 export function ElementInspector({
   initialIsActive = true,
-  excludeSelector = '.element-inspector-bubble, .element-inspector-controls',
+  excludeSelector = '.element-inspector-bubble, .element-inspector-controls, .element-inspector-mention',
   elementLabel,
   selectorStyle,
   highlighterStyle,

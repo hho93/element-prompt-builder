@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useAuthStore } from "../stores/auth";
+import { useWorkflowsStore } from "../stores/workflows";
 
 type TabType = 'chat' | 'design' | 'workflow' | null;
 
@@ -20,16 +20,14 @@ const extractElementProperties = (el: HTMLElement) => ({
 /**
  * Maps an HTML element to a serializable object representation
  */
-const mapElementToObject = (el: HTMLElement) => {
-  // Find all form elements inside this element
-  const formElements = Array.from(el.querySelectorAll('input, textarea, select'))
-    .filter(formEl => formEl instanceof HTMLElement)
-    .map((formEl: HTMLElement) => extractElementProperties(formEl));
-    
-  return {
-    ...extractElementProperties(el),
-    childrens: formElements
-  };
+const getAllFormElements = (): string[] => {
+  const formElements = Array.from(
+    document.querySelectorAll(
+      '[data-name$="-select"], [data-name$="-input"], [data-name$="-checkbox"], [data-name$="-radio"], [data-name$="-textarea"]'
+    )
+  ).filter((formEl): formEl is HTMLElement => formEl instanceof HTMLElement);
+  const dataNames = formElements.map((el) => el.getAttribute("data-name") || "");
+  return dataNames.filter(Boolean); // Remove any empty strings if attribute is missing
 };
 
 /**
@@ -58,8 +56,8 @@ export function useIframeMessaging() {
         else if (newActiveTab === 'design' || newActiveTab === 'workflow') {
           setShouldEnableInspect(true);
         }
-      } else if (event.data?.type === 'ACCESS_TOKEN') {
-        useAuthStore.getState().setAccessToken(event.data.payload.token);
+      } else if (event.data?.type === 'WORKFLOW_LIST') {
+        useWorkflowsStore.getState().setWorkflows(event.data.workflows);
       }
     };
     
@@ -75,7 +73,8 @@ export function useIframeMessaging() {
     window.parent.postMessage({
       type: 'ELEMENT_INSPECTOR_SELECTED',
       payload: {
-        elements: elements.map(el => mapElementToObject(el))
+        referenceInputs: getAllFormElements(),
+        elements: elements.map(el => extractElementProperties(el))
       }
     }, '*');
   }, [isInIframe]);
@@ -87,9 +86,11 @@ export function useIframeMessaging() {
     window.parent.postMessage({
       type: 'ELEMENT_INSPECTOR_PROMPT',
       payload: {
+        workflowId: useWorkflowsStore.getState().workflowId,
         prompt,
         activeTab,
-        elements: elements.map(mapElementToObject)
+        referenceInputs: getAllFormElements(),
+        elements: elements.map(el => extractElementProperties(el))
       }
     }, '*');
   }, [isInIframe, activeTab]);

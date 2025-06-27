@@ -51,14 +51,11 @@ export function PromptForm({
     <form onSubmit={handlePromptSubmit}>
       <div style={formContainerStyles.wrapper}>
         <div style={formContainerStyles.inputWrapper}>
-          <div className="mt-1">
-            <IconAi />
-          </div>
+          <IconAi />
           <MentionChat
-            input={userPrompt}
-            handleInputChange={(e) => setUserPrompt(e.target.value)}
-            textAreaClassName="p-0"
-            mentionContentClassName="z-[10001]"
+            handleInputChange={setUserPrompt}
+            textAreaClassName="text-sm resize-none"
+            // mentionContentClassName="z-[10001]"
           />
           {/* <textarea
             value={userPrompt}

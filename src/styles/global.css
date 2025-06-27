@@ -110,3 +110,10 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+
+
+body span[data-tag] {
+  background-color: #ebf5fb !important;
+  color: #1566a4 !important;
+  border-radius: 4px !important;
+}

@@ -9,13 +9,13 @@ export const formContainerStyles = {
     display: "flex",
     flexDirection: "row",
     gap: "8px",
-    alignItems: "flex-start",
+    alignItems: "center",
     width: "100%",
   } as React.CSSProperties,
   
   inputWrapper: {
     display: 'flex',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     position: 'relative',
     gap: '5px',
     width: '100%' 

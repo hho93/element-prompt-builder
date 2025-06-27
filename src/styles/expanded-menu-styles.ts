@@ -13,7 +13,7 @@ export const getExpandedMenuStyles = (
     container: {
       ...layout.expandedMenu,
       ...(isDarkMode ? darkMode.expandedMenu : {}),
-      padding: '16px',
+      padding: '10px 8px',
       position: 'fixed', // Use fixed to stay consistent with scroll position
       top: `${top}px`,
       left: `${left}px`,

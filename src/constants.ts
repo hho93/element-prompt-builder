@@ -6,7 +6,7 @@
 export const UI_CONSTANTS = {
   // Menu dimensions
   MENU_WIDTH: 350, // Width of the control menu in pixels
-  MENU_HEIGHT: 94, // Height of the control menu in pixels
+  MENU_HEIGHT: 56, // Height of the control menu in pixels
   
   // Spacing and offsets
   SPACING: 10, // Standard spacing for margins and padding
