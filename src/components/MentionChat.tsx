@@ -116,7 +116,7 @@ export const MentionChat: React.FC<MentionChatProps> = ({
         style={{ ...style, resize: 'none' }}
       />
       {values.length === 0 && (
-        <MentionContent className={cn("max-h-[200px] h-[200px] min-w-[250px] overflow-y-auto relative border-none outline-none", mentionContentClassName)} style={{ zIndex: 10001 }}>
+        <MentionContent className={cn("max-h-[200px] h-[200px] min-w-[250px] overflow-y-auto relative border-none outline-none bg-white", mentionContentClassName)} style={{ zIndex: 10001 }}>
           <Mapper data={workflows} extractedKey={'id'}>
             {(item) => (
               <MentionItem
